@@ -227,6 +227,7 @@ namespace Fennton::Flood {
         Monitor::term();
     }
     static void loop() {
+        // Toggles fullscreen mode.
         if (mainWindow->GetKeyPulseIn(Window::Key::Key_F11)) {
             if (mainWindow->HasMonitor()) {
                 mainWindow->UnsetMonitor();
