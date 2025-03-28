@@ -1,0 +1,28 @@
+{
+    "width": 160,
+    "height": 90,
+    "updateRate": 20,
+    "scene": "scenes/LightsOnly1.png",
+    "lights": [
+        {
+            "position": [ 50, 30 ],
+            "colour": [ 1.0, 1.0, 1.0 ]
+        },
+        {
+            "position": [ 80, 20 ],
+            "colour": [ 1.0, 0.5, 1.0 ]
+        }
+    ]/* {
+        // Omnidirectional light.
+        "point": [
+            {
+                "position": [ 50, 30 ],
+                "colour": [ 1.0, 1.0, 1.0 ]
+            },
+            {
+                "position": [ 80, 20 ],
+                "colour": [ 1.0, 0.5, 1.0 ]
+            }
+        ]
+    } */
+}
