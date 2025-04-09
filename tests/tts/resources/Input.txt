@@ -1,0 +1,7 @@
+<ssml>
+<voice name="slt">
+
+<prosody rate="0.8">his uneventful and <prosody range="20.0">boring</prosody> </prosody><prosody rate="0.7">day at work</prosody>.
+
+</voice>
+</ssml>

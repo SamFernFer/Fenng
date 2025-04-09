@@ -1,0 +1,11 @@
+2025-04-08T22:19
+
+<ssml>
+<voice name="slt">
+
+<prosody rate="0.8">Hello, this is Miss <phoneme ph="hh aa n aa">Hana</phoneme>. <break /> Mister Steve was ready to get back to his </prosody><prosody rate="0.6">far away home</prosody><break /> <prosody rate="0.8">and forget about his uneventful and <prosody pitch="1.2">boring</prosody> </prosody><prosody rate="0.7">day at work</prosody>.
+
+</voice>
+</ssml>
+
+23:27
