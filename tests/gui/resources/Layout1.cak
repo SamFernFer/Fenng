@@ -1,0 +1,4 @@
+@Rectangle:(
+	.size = { .x = 100dpi, .y = 100 },
+	.position = { .x = 100, .y = 100 }
+){}
