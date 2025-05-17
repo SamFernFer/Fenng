@@ -1,8 +1,12 @@
 # Fenng
 
-Fenng, a multimedia engine and library.
+Fenng, (will be) a multimedia engine and library.
 
-# Compiling
+# Status
+
+The engine will be rewritten from the ground up (see the discussion).
+
+# (not yet) Compiling
 
 Follow the normal CMake compilation steps, with the addition of defining `BOOST_ROOT` to where your Boost installation is. Set CMAKE_BUILD_TYPE to Release or Debug depending on whether you want debug symbols or not. Use `-DCMAKE_CXX_FLAGS=-DBOOST_ALL_NO_LIB=ON` if you do not want to build Boost separatedly. Remember that you can use `-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded` and `-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug` for compiling with a static C++ runtime on Windows and to match the value of `CMAKE_MSVC_RUNTIME_LIBRARY` with the build type (`CMAKE_BUILD_TYPE`): you should use `-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug` together with `-DCMAKE_BUILD_TYPE=Debug`, for instance.
 
