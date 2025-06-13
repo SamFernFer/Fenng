@@ -2,7 +2,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD 20)
 
-set(ProgramName fenng)
+set(ProgramName window)
 
 add_executable(${ProgramName}
     "Main.cpp"
@@ -22,4 +22,4 @@ else()
 	)
 endif()
 
-set_target_properties(${ProgramName} PROPERTIES OUTPUT_NAME fenng)
+set_target_properties(${ProgramName} PROPERTIES OUTPUT_NAME window)
