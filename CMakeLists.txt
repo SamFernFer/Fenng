@@ -1,23 +1,30 @@
 cmake_minimum_required(VERSION 3.15)
 project(Fenng VERSION 1.0)
 
-# Gets the output directory's prefix based on the build type.
-if (
-    CMAKE_BUILD_TYPE STREQUAL Debug
-    OR CMAKE_BUILD_TYPE STREQUAL debug
-)
-    set(OutputSubdir "/debug")
-elseif(
-    CMAKE_BUILD_TYPE STREQUAL Release
-    OR CMAKE_BUILD_TYPE STREQUAL release
-)
-    set(OutputSubdir "/release")
+if (FENNTON_OUTPUT_PREFIX)
+    set(OutputSubdir "/${FENNTON_OUTPUT_PREFIX}")
 else()
-    set(OutputSubdir "/${CMAKE_BUILD_TYPE}")
+    # Empties the prefix.
+    set(OutputSubdir "")
 endif()
+
+option(FENNTON_BUILD_TESTS "Whether to build the tests." OFF)
+option(FENNTON_BUILD_MAIN "Whether to build the main program." ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin${OutputSubdir}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/main")
+# Adds the individual core libraries.
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/utils")
+
+# Optionally builds the main executable.
+if (FENNTON_BUILD_MAIN)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/src/main")
+endif()
+# Optionally builds the tests (manual and automatic).
+if (FENNTON_BUILD_TESTS)
+    set(FullDir "tests/build${OutputSubdir}")
+    file(MAKE_DIRECTORY ${FullDir})
+    add_subdirectory("${ParentPath}/tests" ${FullDir})
+endif()
