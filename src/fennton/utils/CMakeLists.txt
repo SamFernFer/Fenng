@@ -1,8 +1,9 @@
-set(ProgramName fenng)
+set(ProgramName fennton_utils)
 
-add_executable(${ProgramName}
-    "Main.cpp"
+add_library(${ProgramName} STATIC
+    "Console.cpp"
 )
+target_include_directories(fennton_utils PUBLIC ${IncludeDir})
 
 target_compile_definitions(${ProgramName} PUBLIC
 )

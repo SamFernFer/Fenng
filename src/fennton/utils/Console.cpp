@@ -1,10 +1,30 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <fennton/utils/Console.hpp>
 
 namespace Fennton::Console {
+    #ifdef _WIN32
+    static std::optional<decltype(GetConsoleOutputCP())> lastCP;
+    #endif
+
     void init() {
-        d
+        #ifdef _WIN32
+        // Saves the previous codepage.
+        lastCP = GetConsoleOutputCP();
+        // Changes the console's codepage to support UTF-8.
+        SetConsoleOutputCP(CP_UTF8);
+        #endif
     }
     void term() {
-        d
+        #ifdef _WIN32
+        // Only resets the console's codepage if init was called, and thus the last codepage 
+        // saved.
+        if (lastCP) {
+            // Reverts the console's codepage to the previous one.
+            SetConsoleOutputCP(*lastCP);
+        }
+        #endif
     }
 }
