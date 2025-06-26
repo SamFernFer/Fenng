@@ -1,0 +1,18 @@
+[
+    {
+        "console": {
+            "init": [
+                {
+                    "name": "encoding",
+                    "sections": {
+                        // Text display.
+                        "simple": {},
+                        "double_term": {},
+                        "double_init": {}
+                    }
+                }
+            ],
+            "print": {}
+        }
+    }
+]
