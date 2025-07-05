@@ -9,6 +9,10 @@ namespace Fennton::Console {
     static std::optional<decltype(GetConsoleOutputCP())> lastCP;
     #endif
 
+    // The default stream used by the print* functions.
+    // For now it's always std::cout.
+    static std::ostream* defaultStream = &std::cout;
+
     void init() {
         #ifdef _WIN32
         // Saves the previous codepage.
@@ -24,6 +28,9 @@ namespace Fennton::Console {
         if (lastCP) {
             // Reverts the console's codepage to the previous one.
             SetConsoleOutputCP(*lastCP);
+            // Resets lastCP to handle the console's previous codepage 
+            // changing after a previous termination or initialisation.
+            lastCP = {};
         }
         #endif
     }

@@ -9,4 +9,12 @@ namespace Fennton::Console {
 
     // Terminates the console module.
     void term();
+
+    // [Not implemented yet]
+    // void setDefaultStream();
+
+    // Prints the value to the output stream.
+    template<typename T> void print(std::ostream& out, T const& v) {
+        out << v;
+    }
 }
