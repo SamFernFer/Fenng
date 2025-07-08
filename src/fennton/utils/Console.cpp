@@ -13,6 +13,16 @@ namespace Fennton::Console {
     // For now it's always std::cout.
     static std::ostream* defaultStream = &std::cout;
 
+    Printer defaultPrinter = Printer(std::cout);
+
+    Printer::Printer(std::ostream& out) : out(out) {}
+    void Printer::printl() {
+        out << std::endl;
+    }
+    std::ostream& Printer::getStream() {
+        return out;
+    }
+
     void init() {
         #ifdef _WIN32
         // Saves the previous codepage.
@@ -33,5 +43,18 @@ namespace Fennton::Console {
             lastCP = {};
         }
         #endif
+    }
+    void pause() {
+        std::cin.get();
+    }
+    void pause(std::string_view msg) {
+        print(msg);
+        pause();
+    }
+    Printer& getDefaultPrinter() {
+        return defaultPrinter;
+    }
+    void printl() {
+        defaultPrinter.printl();
     }
 }
