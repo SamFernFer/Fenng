@@ -16,7 +16,7 @@ namespace Fennton::Console {
 
         // Prints the value to the output stream.
         template<typename T> void print(T const& v) {
-            out << v;
+            out << v << std::flush;
         }
 
         // Prints a line break.
@@ -29,7 +29,7 @@ namespace Fennton::Console {
 
         // Prints the formatted value to the output stream.
         template<typename... A> void print(std::string_view fmt, A&&... args) {
-            out << std::vformat(fmt, std::make_format_args(args...));
+            out << std::vformat(fmt, std::make_format_args(args...)) << std::flush;
         }
 
         // Prints the formatted value to the output stream.

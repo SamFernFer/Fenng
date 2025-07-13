@@ -1,12 +1,9 @@
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_STANDARD 20)
+set(ProgramName fennton_window)
 
-set(ProgramName window)
-
-add_executable(${ProgramName}
-    "Main.cpp"
+add_library(${ProgramName} STATIC
+	"Window.cpp"
 )
+target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
 
 target_compile_definitions(${ProgramName} PUBLIC
 )
@@ -22,4 +19,4 @@ else()
 	)
 endif()
 
-set_target_properties(${ProgramName} PROPERTIES OUTPUT_NAME window)
+set_target_properties(${ProgramName} PROPERTIES OUTPUT_NAME ${ProgramName})

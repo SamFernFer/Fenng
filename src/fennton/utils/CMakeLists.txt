@@ -4,7 +4,7 @@ add_library(${ProgramName} STATIC
 	"Console.cpp"
 	"Text.cpp"
 )
-target_include_directories(fennton_utils PUBLIC ${IncludeDir})
+target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
 
 target_compile_definitions(${ProgramName} PUBLIC
 )

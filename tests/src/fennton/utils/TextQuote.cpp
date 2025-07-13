@@ -50,7 +50,10 @@ template <bool alwaysShow> int test() {
     _case("nv", "nv");
     _case("Hello, world!", "Hello, world!");
 
+    _case(R"(n\v)", "n\v");
+    _case(R"(\nv)", "\nv");
     _case(R"(first\nsecond\nthird)", "first\nsecond\nthird");
+    _case(R"(\'\\v\' is \v)", "\'\\v\' is \v");
     _case(
         R"(This is null (\'\0\'), but not at the end.\n)"s,
         "This is null (\'\0\'), but not at the end.\n"s

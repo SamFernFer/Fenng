@@ -23,6 +23,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 
 # Adds the individual core libraries.
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/utils")
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/window")
 
 # Optionally builds the main executable.
 if (FENNTON_BUILD_MAIN)
