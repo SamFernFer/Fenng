@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+using namespace std::string_literals;
 using namespace Fennton;
 
 static std::int64_t testCount = 0, failCount = 0;
@@ -43,8 +44,17 @@ template <bool alwaysShow> void testCase(std::string const& expected, std::strin
 }
 template <bool alwaysShow> int test() {
     constexpr auto _case = testCase<alwaysShow>;
+
+    _case("", "");
+    _case("012", "012");
+    _case("nv", "nv");
     _case("Hello, world!", "Hello, world!");
+
     _case(R"(first\nsecond\nthird)", "first\nsecond\nthird");
+    _case(
+        R"(This is null (\'\0\'), but not at the end.\n)"s,
+        "This is null (\'\0\'), but not at the end.\n"s
+    );
     
     #include <fennton/utils/TextQuoteGenerated.hpp>
 
