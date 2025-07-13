@@ -1,4 +1,5 @@
 #include <fennton/utils/Console.hpp>
+#include <fennton/utils/Text.hpp>
 
 #include <functional>
 #include <sstream>
@@ -8,6 +9,8 @@
 #include <cstdint>
 #include <cstring>
 #include <typeinfo>
+
+namespace Text = Fennton::Text;
 
 static std::int64_t failCount = 0, testCount = 0;
 Fennton::Console::Printer* printer = nullptr;
@@ -26,10 +29,6 @@ public:
         return out;
     }
 };
-
-static std::string quote(std::string const& str) {
-    return "\"" + str + "\"";
-}
 
 // Tests a specific case for the Console::print and Console::println functions.
 template<typename... A> void testCase(
@@ -71,8 +70,8 @@ template<typename... A> void testCase(
             // Checks if the text is correct and the extra condition is met.
             std::string _str = _ss.str();
             if (_str != expected) {
-                std::cout << "[EXPECTED] " << quote(std::string(expected)) << "" << std::endl;
-                std::cout << "[ACTUAL]   " << quote(_str) << "" << std::endl;
+                std::cout << "[EXPECTED] " << Text::quote(std::string(expected)) << "" << std::endl;
+                std::cout << "[ACTUAL]   " << Text::quote(_str) << "" << std::endl;
                 _fail = true;
             }
             if (_fail) {
