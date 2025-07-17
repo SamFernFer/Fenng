@@ -63,6 +63,9 @@ namespace Fennton::Console {
     // pressed.
     void pausel(std::string_view msg);
 
+    // Waits for a line to be input into the console and returns it as a string.
+    std::string readl();
+
     // Returns the default printer.
     Printer& getDefaultPrinter();
 

@@ -3,6 +3,7 @@
 #endif
 
 #include <fennton/utils/Console.hpp>
+#include <sstream>
 
 namespace Fennton::Console {
     #ifdef _WIN32
@@ -45,7 +46,12 @@ namespace Fennton::Console {
         #endif
     }
     void pause() {
-        std::cin.get();
+        // The character type, just to make it as cross-platform as possible.
+        using CharT = decltype(std::cin)::char_type;
+        // The EOF character.
+        CharT _eof = decltype(std::cin)::traits_type::eof();
+        // Loops until stdin is clear.
+        while (std::cin.get() != _eof) {}
     }
     void pause(std::string_view msg) {
         print(msg);
@@ -58,6 +64,20 @@ namespace Fennton::Console {
     void pausel(std::string_view msg) {
         printl(msg);
         pause();
+    }
+    std::string readl() {
+        std::stringstream _ss;
+        // The character type, just to make it as cross-platform as possible.
+        using CharT = decltype(std::cin)::char_type;
+        // The EOF character.
+        CharT _eof = decltype(std::cin)::traits_type::eof();
+
+        while (true) {
+            CharT _c = std::cin.get();
+            if (_c == _eof) break;
+            _ss << _c;
+        }
+        return _ss.str();
     }
 
     Printer& getDefaultPrinter() {
