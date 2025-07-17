@@ -118,19 +118,28 @@ template<bool manual> int test() {
     std::stringstream _ss;
     Fennton::Console::Printer _printerObj = Fennton::Console::Printer(_ss);
 
-    if constexpr (!manual) {
+    if constexpr (manual) {
+        // pause and pausel (the VS Code internal debug console doesn't seem to respect 
+        // std::flush).
+        // Console::pausel is tested between sections and Console::pause is tested at the end, 
+        // too.
+        Fennton::Console::pause("[TEST] pause and pause without message.");
+        Fennton::Console::pause();
+        Fennton::Console::pausel("[TEST] pausel and pausel without message.");
+        Fennton::Console::pausel();
+    } else {
         printer = &_printerObj;
-    }
+    }    
 
     // Testing printing a line break on its own.
     if constexpr (manual)
-        Fennton::Console::pause("[TEST] Empty.");
+        Fennton::Console::pausel("[TEST] Empty.");
 
     testCase("");
 
     // Testing Console::print and Testing Console::printl.
     if constexpr (manual)
-        Fennton::Console::pause("[TEST] Single value.");
+        Fennton::Console::pausel("[TEST] Single value.");
 
     std::string _str1 = "My string.";
     testCase(_str1, "My string.");
@@ -159,7 +168,7 @@ template<bool manual> int test() {
 
     // Formatting.
     if constexpr (manual)
-        Fennton::Console::pause("[TEST] Formatting.");
+        Fennton::Console::pausel("[TEST] Formatting.");
 
     testCase("number: 89", "number: {}", 89);
     testCase("0", "{1}", 101, 0);
@@ -167,8 +176,7 @@ template<bool manual> int test() {
     testCase("This is 0x0", "This is {}", nullptr);
 
     if constexpr(manual) {
-        Fennton::Console::print("[END]");
-        Fennton::Console::pause();
+        Fennton::Console::pause("[END]");
         return 0;
     } else {
         printer = nullptr;

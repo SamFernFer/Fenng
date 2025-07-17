@@ -51,6 +51,15 @@ namespace Fennton::Console {
         print(msg);
         pause();
     }
+    void pausel() {
+        printl();
+        pause();
+    }
+    void pausel(std::string_view msg) {
+        printl(msg);
+        pause();
+    }
+
     Printer& getDefaultPrinter() {
         return defaultPrinter;
     }

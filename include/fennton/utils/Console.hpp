@@ -56,6 +56,13 @@ namespace Fennton::Console {
     // Pauses the console until the Enter key is pressed, after showing the specified message.
     void pause(std::string_view msg);
 
+    // Prints a new-line and pauses the console until the Enter key is pressed.
+    void pausel();
+
+    // Prints the message followed by a new-line and pauses the console until the Enter key is 
+    // pressed.
+    void pausel(std::string_view msg);
+
     // Returns the default printer.
     Printer& getDefaultPrinter();
 
