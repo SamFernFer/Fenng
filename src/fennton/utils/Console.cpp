@@ -52,7 +52,7 @@ namespace Fennton::Console {
         // The EOF character.
         CharT _eof = Traits::eof();
         CharT _nl = std::cin.widen('\n');
-        // Loops until stdin is clear.
+        // Loops until either stdin is clear or a line has been extracted.
         while (true) {
             CharT _c = std::cin.get();
             if (Traits::eq(_c, _eof) || Traits::eq(_c, _nl)) {
@@ -76,12 +76,16 @@ namespace Fennton::Console {
         std::stringstream _ss;
         // The character type, just to make it as cross-platform as possible.
         using CharT = decltype(std::cin)::char_type;
+        using Traits = decltype(std::cin)::traits_type;
         // The EOF character.
-        CharT _eof = decltype(std::cin)::traits_type::eof();
-
+        CharT _eof = Traits::eof();
+        CharT _nl = std::cin.widen('\n');
+        // Loops until either stdin is clear or a line has been extracted.
         while (true) {
             CharT _c = std::cin.get();
-            if (_c == _eof) break;
+            if (Traits::eq(_c, _eof) || Traits::eq(_c, _nl)) {
+                break;
+            }
             _ss << _c;
         }
         return _ss.str();
