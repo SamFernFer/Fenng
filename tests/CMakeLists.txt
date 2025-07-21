@@ -9,4 +9,4 @@ set(IncludeDir $IncludeDir "${PROJECT_SOURCE_DIR}/include")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/gui")
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/utils")
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/window")
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/gl")

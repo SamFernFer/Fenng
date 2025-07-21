@@ -12,7 +12,13 @@ else()
     set(OutputSubdir "")
 endif()
 
-set(IncludeDir "${PROJECT_SOURCE_DIR}/include")
+set(IncludeDir
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_SOURCE_DIR}/depends/glad/include"
+    "${PROJECT_SOURCE_DIR}/depends/glfw/include"
+    "${PROJECT_SOURCE_DIR}/depends/glm"
+    # "${PROJECT_SOURCE_DIR}/depends/stb"
+)
 
 option(FENNTON_BUILD_TESTS "Whether to build the tests." OFF)
 option(FENNTON_BUILD_MAIN "Whether to build the main program." ON)
@@ -21,9 +27,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin${OutputSubdir}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 
+# Adds the external libraries.
+add_subdirectory("${PROJECT_SOURCE_DIR}/depends/glfw")
+add_subdirectory("${PROJECT_SOURCE_DIR}/depends/glm")
+
 # Adds the individual core libraries.
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/utils")
-add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/window")
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/gl")
 
 # Optionally builds the main executable.
 if (FENNTON_BUILD_MAIN)
