@@ -65,6 +65,12 @@ namespace Fennton::Gl {
     void Window::SwapBuffers() {
         glfwSwapBuffers(handle);
     }
+    void Window::Hide() {
+        glfwHideWindow(handle);
+    }
+    void Window::Show() {
+        glfwShowWindow(handle);
+    }
     void Window::Destroy() {
         glfwDestroyWindow(handle);
     }

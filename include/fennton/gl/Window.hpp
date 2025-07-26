@@ -46,6 +46,10 @@ namespace Fennton::Gl {
         bool IsIconified();
         // Swaps the window's buffers for drawing.
         void SwapBuffers();
+        // Hides the window, making it invisible and removing it from the taskbar.
+        void Hide();
+        // Shows the window, making it visible and adding it to the taskbar.
+        void Show();
         // Destroys the window, invalidating its handle.
         void Destroy();
     };
