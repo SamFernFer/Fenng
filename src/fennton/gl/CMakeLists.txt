@@ -6,6 +6,7 @@ add_library(${ProgramName} STATIC
 )
 target_link_libraries(${ProgramName} PUBLIC glfw glm)
 target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
+target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
 
 target_compile_definitions(${ProgramName} PUBLIC
 )

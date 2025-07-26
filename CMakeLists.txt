@@ -14,10 +14,12 @@ endif()
 
 set(IncludeDir
     "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_SOURCE_DIR}/depends/glad/include"
     "${PROJECT_SOURCE_DIR}/depends/glfw/include"
     "${PROJECT_SOURCE_DIR}/depends/glm"
     # "${PROJECT_SOURCE_DIR}/depends/stb"
+)
+set(SystemIncludeDir
+    "${PROJECT_SOURCE_DIR}/depends/glad/include"
 )
 
 option(FENNTON_BUILD_TESTS "Whether to build the tests." OFF)

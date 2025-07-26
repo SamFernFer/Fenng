@@ -34,11 +34,16 @@ namespace Fennton::Gl {
         );
         // Processes the window events for all windows, including input and resizing.
         static void pollEvents();
+        // Returns true if any window has a current context. A current context is required to 
+        // be able to initialise the graphics library.
+        static bool hasCurrentContext();
         // Makes the window's graphics context the current one.
         void MakeContextCurrent();
         // Returns true if the window should close (if the user closed it manually, for 
         // instance).
         bool ShouldClose();
+        // Returns true if the window is iconified.
+        bool IsIconified();
         // Swaps the window's buffers for drawing.
         void SwapBuffers();
         // Destroys the window, invalidating its handle.

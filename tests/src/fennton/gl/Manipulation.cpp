@@ -1,6 +1,7 @@
 #include <fennton/gl/Window.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
+#include <glad/glad.h>
 #include <thread>
 #include <chrono>
 #include <stdexcept>
@@ -32,6 +33,11 @@ int main() {
 
         while (!_win->ShouldClose()) {
             Window::pollEvents();
+
+            if (!_win->IsIconified()) {
+                glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+            }
             _win->SwapBuffers();
         }
         _win->Destroy();

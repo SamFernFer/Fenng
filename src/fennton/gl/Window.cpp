@@ -1,4 +1,5 @@
 #include <fennton/gl/Window.hpp>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 
@@ -13,7 +14,7 @@ namespace Fennton::Gl {
     }
     void Window::init() {
         if (!glfwInit()) {
-            throw std::runtime_error("Failed to initialise GLFW.");
+            throw std::runtime_error("Window: Failed to initialise GLFW.");
         }
         // Sets window-creation hints.
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -42,18 +43,24 @@ namespace Fennton::Gl {
             share? share->GetHandle() : NULL
         );
         if (_handle == NULL) {
-            throw std::runtime_error("Failed to create GLFW window.");
+            throw std::runtime_error("Window: Failed to create GLFW window.");
         }
         return makeStrong<Window>(_handle);
     }
     void Window::pollEvents() {
         glfwPollEvents();
     }
+    bool Window::hasCurrentContext() {
+        return glfwGetCurrentContext() != NULL;
+    }
     void Window::MakeContextCurrent() {
         glfwMakeContextCurrent(handle);
     }
     bool Window::ShouldClose() {
         return glfwWindowShouldClose(handle);
+    }
+    bool Window::IsIconified() {
+        return glfwGetWindowAttrib(handle, GLFW_ICONIFIED);
     }
     void Window::SwapBuffers() {
         glfwSwapBuffers(handle);
@@ -62,6 +69,11 @@ namespace Fennton::Gl {
         glfwDestroyWindow(handle);
     }
     void init() {
-        
+        if (!Window::hasCurrentContext()) {
+            throw std::runtime_error("GL: Cannot initialise GLAD without a current context.");
+        }
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+            throw std::runtime_error("GL: Failed to initialised GLAD.");
+        }
     }
 }
