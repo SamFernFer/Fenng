@@ -21,7 +21,7 @@ int main() {
         Strong<Window> _win = Window::create(
             800, // Initial width.
             600, // Initial height.
-            "Window Manip" // Window name.
+            "Window Manip", // Window name.
             nullptr, // Not fullscreen.
             nullptr // Not sharing its context.
         );
@@ -29,6 +29,12 @@ int main() {
         _win->MakeContextCurrent();
         // Initialises OpenGL.
         Gl::init();
+
+        while (!_win->ShouldClose()) {
+            Window::pollEvents();
+            _win->SwapBuffers();
+        }
+        _win->Destroy();
 
         Console::pause();
     } catch (std::exception& e) {
