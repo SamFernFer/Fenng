@@ -5,6 +5,9 @@
 #include <thread>
 #include <chrono>
 #include <stdexcept>
+#include <thread>
+#include <string>
+#include <atomic>
 
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
@@ -13,8 +16,17 @@ namespace Gl = Fennton::Gl;
 using namespace Fennton::Memory;
 using Fennton::Gl::Window;
 
+enum class TestResult {
+    None = 0,
+    Pass = 1,
+    Fail = 2
+};
+
+std::atomic<>
+
 void init();
 void term();
+void askForResult();
 int main() {
     try {
         init();
@@ -30,6 +42,8 @@ int main() {
         _win->MakeContextCurrent();
         // Initialises OpenGL.
         Gl::init();
+
+        std::thread _t1 = std::thread(askForResult);
 
         while (!_win->ShouldClose()) {
             Window::pollEvents();
@@ -58,4 +72,8 @@ void init() {
 void term() {
     Window::term();
     Console::term();
+}
+void askForResult() {
+    std::string _res = Console::readl();
+
 }
