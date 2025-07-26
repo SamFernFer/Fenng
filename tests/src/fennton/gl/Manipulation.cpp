@@ -35,7 +35,7 @@ int main() {
             Window::pollEvents();
 
             if (!_win->IsIconified()) {
-                glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+                glClearColor(0.1f, 0.4f, 0.05f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
             }
             _win->SwapBuffers();
