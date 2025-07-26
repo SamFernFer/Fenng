@@ -1,3 +1,6 @@
+#ifndef FENNTON_TEXT_HPP
+#define FENNTON_TEXT_HPP
+
 #include <string>
 
 namespace Fennton::Text {
@@ -8,3 +11,4 @@ namespace Fennton::Text {
     // replaced with their C++ escape sequences.
     std::string quote(std::string const& str);
 }
+#endif

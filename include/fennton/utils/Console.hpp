@@ -1,3 +1,6 @@
+#ifndef FENNTON_CONSOLE_HPP
+#define FENNTON_CONSOLE_HPP
+
 #include <iostream>
 #include <optional>
 #include <format>
@@ -95,3 +98,4 @@ namespace Fennton::Console {
         defaultPrinter.printl(fmt, args...);
     }
 }
+#endif
