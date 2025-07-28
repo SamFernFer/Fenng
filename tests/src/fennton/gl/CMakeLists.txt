@@ -1,4 +1,18 @@
-add_executable(window_manip "Manipulation.cpp")
-target_link_libraries(window_manip fennton_utils fennton_gl)
-target_include_directories(window_manip PUBLIC ${IncludeDir})
-target_include_directories(window_manip SYSTEM PUBLIC ${SystemIncludeDir})
+set(ProgramName window_manip)
+
+add_executable(${ProgramName} "Manipulation.cpp")
+target_link_libraries(${ProgramName} fennton_utils fennton_gl)
+target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
+target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
+
+if(MSVC)
+	target_compile_options(${ProgramName} PUBLIC /Zc:preprocessor)
+else()
+	target_compile_options(${ProgramName} PUBLIC
+		-Wpedantic
+		-Werror=return-type
+		# -Wno-switch
+		-Werror=extern-initializer
+		-Werror=microsoft-template
+	)
+endif()

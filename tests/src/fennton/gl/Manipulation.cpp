@@ -9,6 +9,7 @@
 #include <string>
 #include <locale>
 #include <atomic>
+#include <functional>
 #include <algorithm>
 #include <cstdint>
 
@@ -19,22 +20,21 @@ namespace Gl = Fennton::Gl;
 using namespace Fennton::Memory;
 using Fennton::Gl::Window;
 
-enum class TestResult {
-    None = 0,
-    Pass = 1,
-    Fail = 2
-};
+typedef void(*TestStep)();
 
-// std::atomic<TestResult> testResult = TestResult::None;
+Strong<Window> mainWindow = nullptr;
+TestStep lastStep = nullptr;
+std::atomic<TestStep> testStep = nullptr;
 
 void init();
 void term();
-void askForResult();
+// void runStep();
+void runTests();
 int main() {
     try {
         init();
 
-        Strong<Window> _win = Window::create(
+        mainWindow = Window::create(
             800, // Initial width.
             600, // Initial height.
             "Window Manip", // Window name.
@@ -42,23 +42,29 @@ int main() {
             nullptr // Not sharing its context.
         );
         // It is necessary to have a current context before initialising the graphics.
-        _win->MakeContextCurrent();
+        mainWindow->MakeContextCurrent();
         // Initialises OpenGL.
         Gl::init();
 
-        std::thread _t1 = std::thread(askForResult);
+        std::thread _t1 = std::thread(runTests);
         _t1.detach();
 
-        while (!_win->ShouldClose()) {
+        while (!mainWindow->ShouldClose()) {
             Window::pollEvents();
 
-            if (!_win->IsIconified()) {
+            if (!mainWindow->IsIconified()) {
                 glClearColor(0.1f, 0.3f, 0.15f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
             }
-            _win->SwapBuffers();
+            mainWindow->SwapBuffers();
+
+            TestStep _currStep = testStep.load();
+            if (lastStep != _currStep) {
+                lastStep = _currStep;
+                _currStep();
+            }
         }
-        _win->Destroy();
+        mainWindow->Destroy();
 
         // Console::pause();
     } catch (std::exception& e) {
@@ -77,16 +83,48 @@ void term() {
     Window::term();
     Console::term();
 }
-void askForResult() {
-    std::string _res = Console::readl();
-    // Converts the string to lowercase using C locale.
-    for (char& c : _res) c = std::tolower(c, std::locale::classic());
+// void runStep() {
+//     std::uint32_t _currStep = testStep.load();
+//     if (_currStep != lastStep) {
+//         switch (static_cast<TestStep>(_currStep)) {
+//             case TestStep::First:
+//                 break;
+//             case TestStep::Final:
+                
+//                 break;
+//         }
+//         lastStep = testStep;
+//     }
+// }
+void runTests() {
+    while (true) {
 
-    if (_res == "fail") {
-        Console::printl("The test failed.");
-    } else if (_res == "pass") {
-        Console::printl("The test passed.");
-    } else {
-        Console::printl("What?");
+        // Execute step by setting the step enum (the first one doesn't have anything.
+        // Hide window.
+        // Ask if it worked.
+
+        // Repeat.
+        // Show results.
+
+        std::string _res = Console::readl();
+        // Converts the string to lowercase using C locale.
+        for (char& c : _res) c = std::tolower(c, std::locale::classic());
+
+        if (_res == "fail") {
+            Console::printl("The test failed.");
+            testStep = []()->void {
+                mainWindow->Iconify();
+            };
+        } else if (_res == "pass") {
+            Console::printl("The test passed.");
+            testStep = []()->void {
+                mainWindow->Maximise();
+            };
+        } else {
+            Console::printl("What?");
+            testStep = []()->void {
+                mainWindow->SetShouldClose(true);
+            };
+        }
     }
 }

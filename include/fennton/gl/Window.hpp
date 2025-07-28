@@ -42,6 +42,8 @@ namespace Fennton::Gl {
         // Returns true if the window should close (if the user closed it manually, for 
         // instance).
         bool ShouldClose();
+        // Marks the window for closing.
+        void SetShouldClose(bool shouldClose);
         // Returns true if the window is iconified.
         bool IsIconified();
         // Swaps the window's buffers for drawing.
@@ -50,6 +52,13 @@ namespace Fennton::Gl {
         void Hide();
         // Shows the window, making it visible and adding it to the taskbar.
         void Show();
+        // Maximises the window.
+        void Maximise();
+        // Restores the window to the previous size before maximisation, iconification or going 
+        // fullscreen.
+        void Restore();
+        // Iconifies/minimises the window.
+        void Iconify();
         // Destroys the window, invalidating its handle.
         void Destroy();
     };

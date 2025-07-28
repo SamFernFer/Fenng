@@ -59,6 +59,9 @@ namespace Fennton::Gl {
     bool Window::ShouldClose() {
         return glfwWindowShouldClose(handle);
     }
+    void Window::SetShouldClose(bool shouldClose) {
+        return glfwSetWindowShouldClose(handle, shouldClose);
+    }
     bool Window::IsIconified() {
         return glfwGetWindowAttrib(handle, GLFW_ICONIFIED);
     }
@@ -70,6 +73,15 @@ namespace Fennton::Gl {
     }
     void Window::Show() {
         glfwShowWindow(handle);
+    }
+    void Window::Maximise() {
+        glfwMaximizeWindow(handle);
+    }
+    void Window::Restore() {
+        glfwRestoreWindow(handle);
+    }
+    void Window::Iconify() {
+        glfwIconifyWindow(handle);
     }
     void Window::Destroy() {
         glfwDestroyWindow(handle);

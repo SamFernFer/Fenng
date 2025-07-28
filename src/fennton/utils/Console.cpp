@@ -46,7 +46,7 @@ namespace Fennton::Console {
         #endif
     }
     void pause() {
-        // The character type, just to make it as cross-platform as possible.
+        /* // The character type, just to make it as cross-platform as possible.
         using CharT = decltype(std::cin)::char_type;
         using Traits = decltype(std::cin)::traits_type;
         // The EOF character.
@@ -58,7 +58,10 @@ namespace Fennton::Console {
             if (Traits::eq(_c, _eof) || Traits::eq(_c, _nl)) {
                 break;
             }
-        }
+        } */
+        // Reads a line from the console and immediately discards the contents when 
+        // returning.
+        readl();
     }
     void pause(std::string_view msg) {
         print(msg);
@@ -73,7 +76,7 @@ namespace Fennton::Console {
         pause();
     }
     std::string readl() {
-        std::stringstream _ss;
+        /* std::stringstream _ss;
         // The character type, just to make it as cross-platform as possible.
         using CharT = decltype(std::cin)::char_type;
         using Traits = decltype(std::cin)::traits_type;
@@ -88,7 +91,10 @@ namespace Fennton::Console {
             }
             _ss << _c;
         }
-        return _ss.str();
+        return _ss.str(); */
+        std::string _line;
+        std::getline(std::cin, _line);
+        return std::move(_line);
     }
 
     Printer& getDefaultPrinter() {
