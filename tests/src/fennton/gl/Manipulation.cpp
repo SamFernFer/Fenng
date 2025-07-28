@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <thread>
 #include <string>
+#include <list>
+#include <utility>
 #include <locale>
 #include <atomic>
 #include <functional>
@@ -19,6 +21,7 @@ namespace Gl = Fennton::Gl;
 
 using namespace Fennton::Memory;
 using Fennton::Gl::Window;
+using Ms = std::chrono::milliseconds;
 
 typedef void(*TestStep)();
 
@@ -26,10 +29,14 @@ Strong<Window> mainWindow = nullptr;
 TestStep lastStep = nullptr;
 std::atomic<TestStep> testStep = nullptr;
 
+std::list<std::pair<std::string, bool>> testCases;
+std::int32_t testCount = 0, failCount = 0;
+
 void init();
 void term();
-// void runStep();
 void runTests();
+void runCase(std::string const& testName, void(*stepFunc)());
+void askForResult(std::string const& testName);
 int main() {
     try {
         init();
@@ -66,7 +73,20 @@ int main() {
         }
         mainWindow->Destroy();
 
-        // Console::pause();
+        std::size_t _largestSize = 0;
+        for (auto& _case : testCases) {
+            _largestSize = std::max(_largestSize, _case.first.size());
+        }
+        for (auto& _case : testCases) {
+            Console::printl(
+                "{:>{}}: {}",
+                _case.first,
+                _largestSize,
+                _case.second? "PASS" : "FAIL"
+            );
+        }
+
+        Console::pause();
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
     } catch (...) {
@@ -82,49 +102,58 @@ void init() {
 void term() {
     Window::term();
     Console::term();
+
+    Console::pause();
 }
-// void runStep() {
-//     std::uint32_t _currStep = testStep.load();
-//     if (_currStep != lastStep) {
-//         switch (static_cast<TestStep>(_currStep)) {
-//             case TestStep::First:
-//                 break;
-//             case TestStep::Final:
-                
-//                 break;
-//         }
-//         lastStep = testStep;
-//     }
-// }
 void runTests() {
     while (true) {
+        auto _hideFunc = []()->void {
+            mainWindow->Hide();
+        };
+        auto _showFunc = []()->void {
+            mainWindow->Hide();
+        };
+        auto _closeFunc = []()->void {
+            mainWindow->SetShouldClose(true);
+        };
 
-        // Execute step by setting the step enum (the first one doesn't have anything.
+        // Do nothing.
+        // Wait some seconds so the user can check if the results are okay.
+        std::this_thread::sleep_for(Ms(2000));
+        // Hide the window.
+        testStep = _hideFunc;
+        // Ask if the case passed.
+        askForResult("800x600");
+        // Reshow the window.
+        testStep = _showFunc;
+
+
+        std::this_thread::sleep_for(Ms(2000));
+        testStep = _hideFunc;
+        askForResult("800x600");
+        testStep = _showFunc;
+
+
         // Hide window.
-        // Ask if it worked.
+        
 
         // Repeat.
-        // Show results.
 
-        std::string _res = Console::readl();
-        // Converts the string to lowercase using C locale.
-        for (char& c : _res) c = std::tolower(c, std::locale::classic());
+        std::this_thread::sleep_for(Ms(2000));
+        testStep = _closeFunc;
+    }
+}
+void runCase(std::string const& testName, void(*stepFunc)()) {
+}
+void askForResult(std::string const& testName) {
+    std::string _res = Console::readl();
+    // Converts the string to lowercase using the C locale.
+    for (char& c : _res) c = std::tolower(c, std::locale::classic());
 
-        if (_res == "fail") {
-            Console::printl("The test failed.");
-            testStep = []()->void {
-                mainWindow->Iconify();
-            };
-        } else if (_res == "pass") {
-            Console::printl("The test passed.");
-            testStep = []()->void {
-                mainWindow->Maximise();
-            };
-        } else {
-            Console::printl("What?");
-            testStep = []()->void {
-                mainWindow->SetShouldClose(true);
-            };
-        }
+    decltype(testCases)::reference _case =
+        testCases.emplace_back(std::make_pair(testName, false))
+    ;
+    if (_res == "pass" || _res == "p") {
+        _case.second = true;
     }
 }
