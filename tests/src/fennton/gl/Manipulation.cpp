@@ -7,7 +7,10 @@
 #include <stdexcept>
 #include <thread>
 #include <string>
+#include <locale>
 #include <atomic>
+#include <algorithm>
+#include <cstdint>
 
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
@@ -22,7 +25,7 @@ enum class TestResult {
     Fail = 2
 };
 
-std::atomic<>
+// std::atomic<TestResult> testResult = TestResult::None;
 
 void init();
 void term();
@@ -44,6 +47,7 @@ int main() {
         Gl::init();
 
         std::thread _t1 = std::thread(askForResult);
+        _t1.detach();
 
         while (!_win->ShouldClose()) {
             Window::pollEvents();
@@ -56,7 +60,7 @@ int main() {
         }
         _win->Destroy();
 
-        Console::pause();
+        // Console::pause();
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
     } catch (...) {
@@ -75,5 +79,14 @@ void term() {
 }
 void askForResult() {
     std::string _res = Console::readl();
+    // Converts the string to lowercase using C locale.
+    for (char& c : _res) c = std::tolower(c, std::locale::classic());
 
+    if (_res == "fail") {
+        Console::printl("The test failed.");
+    } else if (_res == "pass") {
+        Console::printl("The test passed.");
+    } else {
+        Console::printl("What?");
+    }
 }
