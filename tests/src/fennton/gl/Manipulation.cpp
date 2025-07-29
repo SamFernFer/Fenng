@@ -21,6 +21,7 @@ namespace Gl = Fennton::Gl;
 
 using namespace Fennton::Memory;
 using Fennton::Gl::Window;
+using Fennton::Gl::Monitor;
 using Ms = std::chrono::milliseconds;
 
 typedef void(*TestStep)();
@@ -28,6 +29,8 @@ typedef void(*TestStep)();
 Strong<Window> mainWindow = nullptr;
 TestStep lastStep = nullptr;
 std::atomic<TestStep> testStep = nullptr;
+std::atomic<bool> askForShouldCloseResults = false;
+std::atomic<bool> shouldAbortTests = false;
 
 std::list<std::pair<std::string, bool>> testCases;
 std::int32_t testCount = 0, failCount = 0;
@@ -36,7 +39,9 @@ void init();
 void term();
 void runTests();
 void runCase(std::string const& testName, void(*stepFunc)());
+void setStepFunc(void(*stepFunc)());
 void askForResult(std::string const& testName);
+void setResult(std::string const& testName, bool success);
 int main() {
     try {
         init();
@@ -71,12 +76,26 @@ int main() {
                 _currStep();
             }
         }
+        // Not need to ask for the result, as reaching this step means it already worked.
+        setResult("ShouldClose", true);
+
+        if (!askForShouldCloseResults.load()) {
+            Console::printl();
+            shouldAbortTests = true;
+        }
+        
         mainWindow->Destroy();
+
+        // Not asking for the step's result when exiting early.
+        if (askForShouldCloseResults.load()) {
+            askForResult("Destroy");
+        }
 
         std::size_t _largestSize = 0;
         for (auto& _case : testCases) {
             _largestSize = std::max(_largestSize, _case.first.size());
         }
+        Console::printl("--------");
         for (auto& _case : testCases) {
             Console::printl(
                 "{:>{}}: {}",
@@ -85,8 +104,6 @@ int main() {
                 _case.second? "PASS" : "FAIL"
             );
         }
-
-        Console::pause();
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
     } catch (...) {
@@ -100,53 +117,96 @@ void init() {
     Window::init();
 }
 void term() {
+    Console::pause();
+
     Window::term();
     Console::term();
-
-    Console::pause();
 }
 void runTests() {
-    while (true) {
-        auto _hideFunc = []()->void {
-            mainWindow->Hide();
-        };
-        auto _showFunc = []()->void {
-            mainWindow->Hide();
-        };
-        auto _closeFunc = []()->void {
-            mainWindow->SetShouldClose(true);
-        };
+    // Do nothing.
+    // Ask if the case passed.
+    askForResult("800x600");
 
-        // Do nothing.
-        // Wait some seconds so the user can check if the results are okay.
-        std::this_thread::sleep_for(Ms(2000));
-        // Hide the window.
-        testStep = _hideFunc;
-        // Ask if the case passed.
-        askForResult("800x600");
-        // Reshow the window.
-        testStep = _showFunc;
+    setStepFunc([]()->void {
+        mainWindow->Hide();
+    });
+    askForResult("Hide");
 
+    setStepFunc([]()->void {
+        mainWindow->Show();
+    });
+    askForResult("Show");
 
-        std::this_thread::sleep_for(Ms(2000));
-        testStep = _hideFunc;
-        askForResult("800x600");
-        testStep = _showFunc;
+    setStepFunc([]()->void {
+        mainWindow->Iconify();
+    });
+    askForResult("Iconify");
 
+    setStepFunc([]()->void {
+        mainWindow->Restore();
+    });
+    askForResult("Restore from Iconify");
 
-        // Hide window.
-        
+    setStepFunc([]()->void {
+        mainWindow->Maximise();
+    });
+    askForResult("Maximise");
 
-        // Repeat.
+    setStepFunc([]()->void {
+        mainWindow->Restore();
+    });
+    askForResult("Restore from Maximise");
 
-        std::this_thread::sleep_for(Ms(2000));
-        testStep = _closeFunc;
-    }
+    setStepFunc([]()->void {
+        mainWindow->Maximise();
+    });
+    askForResult("Maximise before Iconify");
+
+    setStepFunc([]()->void {
+        mainWindow->Iconify();
+    });
+    askForResult("Iconify after Maximise");
+
+    setStepFunc([]()->void {
+        mainWindow->Restore();
+    });
+    askForResult("Restore from Iconify after Maximise");
+
+    setStepFunc([]()->void {
+        mainWindow->Restore();
+    });
+    askForResult("Restore again");
+
+    setStepFunc([]()->void {
+        mainWindow->SetMonitor(Monitor::GetPrimaryMonitor());
+    });
+    askForResult("Fullscreen (windowed)");
+
+    // Enables asking for the result of the ShouldClose step (before this lock ).
+    askForShouldCloseResults = true;
+    
+    setStepFunc([]()->void {
+        mainWindow->SetShouldClose(true);
+    });
+    // Not asking for the results here, but in the main thread.
+
+    
 }
 void runCase(std::string const& testName, void(*stepFunc)()) {
 }
+void setStepFunc(void(*stepFunc)()) {
+    if (shouldAbortTests.load()) return;
+
+    testStep = stepFunc;
+}
 void askForResult(std::string const& testName) {
+    if (shouldAbortTests.load()) return;
+
+    Console::print("{}: ", testName);
     std::string _res = Console::readl();
+
+    if (shouldAbortTests.load()) return;
+    
     // Converts the string to lowercase using the C locale.
     for (char& c : _res) c = std::tolower(c, std::locale::classic());
 
@@ -156,4 +216,7 @@ void askForResult(std::string const& testName) {
     if (_res == "pass" || _res == "p") {
         _case.second = true;
     }
+}
+void setResult(std::string const& testName, bool success) {
+    testCases.emplace_back(std::make_pair(testName, success));
 }
