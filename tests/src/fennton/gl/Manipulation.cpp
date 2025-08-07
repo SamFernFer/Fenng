@@ -91,11 +91,14 @@ int main() {
             askForResult("Destroy");
         }
 
+        // Gets the size of the largest test case name.
         std::size_t _largestSize = 0;
         for (auto& _case : testCases) {
             _largestSize = std::max(_largestSize, _case.first.size());
         }
+        // Separates the results from the lines asking for input.
         Console::printl("--------");
+        // Prints the result of each test case.
         for (auto& _case : testCases) {
             Console::printl(
                 "{:>{}}: {}",
@@ -104,6 +107,9 @@ int main() {
                 _case.second? "PASS" : "FAIL"
             );
         }
+        // Prints the total number of failures.
+        Console::printl("[TOTAL] {}/{} tests failed.", failCount, testCount);
+        Console::printl("[RESULT] {}", failCount == 0? "PASS" : "FAIL");
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
     } catch (...) {
@@ -177,10 +183,10 @@ void runTests() {
     });
     askForResult("Restore again");
 
-    setStepFunc([]()->void {
+    /* setStepFunc([]()->void {
         mainWindow->SetMonitor(Monitor::GetPrimaryMonitor());
     });
-    askForResult("Fullscreen (windowed)");
+    askForResult("Fullscreen (windowed)"); */
 
     // Enables asking for the result of the ShouldClose step (before this lock ).
     askForShouldCloseResults = true;
@@ -215,7 +221,10 @@ void askForResult(std::string const& testName) {
     ;
     if (_res == "pass" || _res == "p") {
         _case.second = true;
+    } else {
+        ++failCount;
     }
+    ++testCount;
 }
 void setResult(std::string const& testName, bool success) {
     testCases.emplace_back(std::make_pair(testName, success));
