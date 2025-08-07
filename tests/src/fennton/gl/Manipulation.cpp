@@ -183,10 +183,10 @@ void runTests() {
     });
     askForResult("Restore again");
 
-    /* setStepFunc([]()->void {
-        mainWindow->SetMonitor(Monitor::GetPrimaryMonitor());
+    setStepFunc([]()->void {
+        mainWindow->SetMonitor(Monitor::GetPrimary());
     });
-    askForResult("Fullscreen (windowed)"); */
+    askForResult("Fullscreen (windowed)");
 
     // Enables asking for the result of the ShouldClose step (before this lock ).
     askForShouldCloseResults = true;
@@ -199,6 +199,7 @@ void runTests() {
     
 }
 void runCase(std::string const& testName, void(*stepFunc)()) {
+    ;
 }
 void setStepFunc(void(*stepFunc)()) {
     if (shouldAbortTests.load()) return;

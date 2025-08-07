@@ -86,6 +86,45 @@ namespace Fennton::Gl {
     void Window::Destroy() {
         glfwDestroyWindow(handle);
     }
+    void Window::SetMonitor(Memory::Strong<Monitor> const& monitor) {
+        if (monitor) {
+            glfwSetWindowMonitor(
+                handle, monitor->GetHandle(),
+                0, 0,
+                monitor->GetWidth(), monitor->GetHeight(),
+                monitor->GetRefreshRate()
+            );
+        } else {
+            Restore();
+        }
+    }
+    GLFWmonitor* Monitor::GetHandle() {
+        return handle;
+    }
+    Monitor::Monitor(GLFWmonitor* handle) {
+        this->handle = handle;
+        // Retrieves the monitor's video mode.
+        GLFWvidmode const* _vidmode = glfwGetVideoMode(handle);
+        // Stores the monitor's current video mode properties.
+        this->width = _vidmode->width;
+        this->height = _vidmode->height;
+        this->redBits = _vidmode->redBits;
+        this->greenBits = _vidmode->greenBits;
+        this->blueBits = _vidmode->blueBits;
+        this->refreshRate = _vidmode->refreshRate;
+    }
+    Strong<Monitor> Monitor::GetPrimary() {
+        return nullptr;
+    }
+    std::int32_t Monitor::GetWidth() const {
+        return width;
+    }
+    std::int32_t Monitor::GetHeight() const {
+        return height;
+    }
+    std::int32_t Monitor::GetRefreshRate() const {
+        return refreshRate;
+    }
     void init() {
         if (!Window::hasCurrentContext()) {
             throw std::runtime_error("GL: Cannot initialise GLAD without a current context.");

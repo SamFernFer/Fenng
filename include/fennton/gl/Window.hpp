@@ -4,6 +4,7 @@
 #include <fennton/utils/Memory.hpp>
 
 struct GLFWwindow;
+struct GLFWmonitor;
 
 namespace Fennton::Gl {
     class Monitor;
@@ -11,13 +12,13 @@ namespace Fennton::Gl {
     class Window {
     private:
         GLFWwindow* handle;
-        // Returns the GLFW handle. Private, because support for other windowing frameworks 
-        // is planned.
+        // Returns the GLFW handle for the window. Private, because support for other windowing 
+        // frameworks is planned.
         GLFWwindow* GetHandle();
     public:
-        // Constructs a Window object from a GLFW handle. It is recommended to call 
-        // Window::create instead of constructing windows manually, specially since the 
-        // backend is going to be different for platforms not supported by GLFW.
+        // Constructs a Window object from a GLFW window handle. It is recommended to use 
+        // Window::create to get a Strong<Window> instead, as the constructor is prone to 
+        // change based on the backend.
         Window(GLFWwindow* handle);
         // Initialises the window-management library and environment.
         static void init();
@@ -61,8 +62,39 @@ namespace Fennton::Gl {
         void Iconify();
         // Destroys the window, invalidating its handle.
         void Destroy();
+        // Sets the window's monitor, making the window windowed fullscreen on it and keeping 
+        // its video mode. If the monitor is null the window becomes windowed and its previous 
+        // monitor gets its previous video mode restored.
+        void SetMonitor(Memory::Strong<Monitor> const& monitor);
     };
     class Monitor {
+        friend class Window;
+    private:
+        // The monitor's handle.
+        GLFWmonitor* handle;
+        // The monitor's width and height.
+        std::int32_t width, height;
+        // The bit depth for each colour channel.
+        std::int32_t redBits, greenBits, blueBits;
+        // The monitor's refresh rate.
+        std::int32_t refreshRate;
+        // Returns the GLFW handle for the monitor. Private, because support for other windowing 
+        // frameworks is planned.
+        GLFWmonitor* GetHandle();
+    public:
+        // Constructs a Monitor object from a GLFW monitor handle. It is recommended to use 
+        // Monitor::GetPrimary, Monitor::GetMonitors, Monitor::GetMonitor and similar functions 
+        // to get Strong<Monitor> objects instead, as the constructor is prone to change 
+        // based on the backend.
+        Monitor(GLFWmonitor* handle);
+        // Returns the primary monitor, or null if none is found or an error happens.
+        static Memory::Strong<Monitor> GetPrimary();
+        // Returns the monitor's width.
+        std::int32_t GetWidth() const;
+        // Returns the monitor's height.
+        std::int32_t GetHeight() const;
+        // Returns the monitor's refresh rate.
+        std::int32_t GetRefreshRate() const;
     };
 
     // Initialises the OpenGL function pointers. Calling MakeContextCurrent on a window before
