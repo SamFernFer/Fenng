@@ -8,6 +8,7 @@
 #include <thread>
 #include <string>
 #include <list>
+#include <unordered_set>
 #include <utility>
 #include <locale>
 #include <atomic>
@@ -35,6 +36,8 @@ std::atomic<bool> shouldAbortTests = false;
 std::list<std::pair<std::string, bool>> testCases;
 std::int32_t testCount = 0, failCount = 0;
 
+std::unordered_set<std::string> testsToExecute;
+
 void init();
 void term();
 void runTests();
@@ -42,8 +45,12 @@ void runCase(std::string const& testName, void(*stepFunc)());
 void setStepFunc(void(*stepFunc)());
 void askForResult(std::string const& testName);
 void setResult(std::string const& testName, bool success);
-int main() {
+int main(int argc, char** argv) {
     try {
+        // Allows for executing only the specified tests, or all of them if none is specified.
+        for (int i = 0; i < argc; ++i) {
+            testsToExecute.emplace(argv[i]);
+        }
         init();
 
         mainWindow = Window::create(
@@ -73,7 +80,10 @@ int main() {
             TestStep _currStep = testStep.load();
             if (lastStep != _currStep) {
                 lastStep = _currStep;
-                _currStep();
+                // Makes sure there is no attempt to execute a null function.
+                if (_currStep) {
+                    _currStep();
+                }
             }
         }
         // Not need to ask for the result, as reaching this step means it already worked.
@@ -129,64 +139,64 @@ void term() {
     Console::term();
 }
 void runTests() {
-    // Do nothing.
-    // Ask if the case passed.
-    askForResult("800x600");
-
-    setStepFunc([]()->void {
-        mainWindow->Hide();
-    });
-    askForResult("Hide");
-
-    setStepFunc([]()->void {
-        mainWindow->Show();
-    });
-    askForResult("Show");
-
-    setStepFunc([]()->void {
-        mainWindow->Iconify();
-    });
-    askForResult("Iconify");
-
-    setStepFunc([]()->void {
-        mainWindow->Restore();
-    });
-    askForResult("Restore from Iconify");
-
-    setStepFunc([]()->void {
-        mainWindow->Maximise();
-    });
-    askForResult("Maximise");
-
-    setStepFunc([]()->void {
-        mainWindow->Restore();
-    });
-    askForResult("Restore from Maximise");
-
-    setStepFunc([]()->void {
-        mainWindow->Maximise();
-    });
-    askForResult("Maximise before Iconify");
-
-    setStepFunc([]()->void {
-        mainWindow->Iconify();
-    });
-    askForResult("Iconify after Maximise");
-
-    setStepFunc([]()->void {
-        mainWindow->Restore();
-    });
-    askForResult("Restore from Iconify after Maximise");
-
-    setStepFunc([]()->void {
-        mainWindow->Restore();
-    });
-    askForResult("Restore again");
-
-    setStepFunc([]()->void {
-        mainWindow->SetMonitor(Monitor::GetPrimary());
-    });
-    askForResult("Fullscreen (windowed)");
+    runCase("800x600",
+        nullptr // Do nothing.
+    );
+    runCase("Hide",
+        []()->void {
+            mainWindow->Hide();
+        }
+    );
+    runCase("Show",
+        []()->void {
+            mainWindow->Show();
+        }
+    );
+    runCase("Iconify",
+        []()->void {
+            mainWindow->Iconify();
+        }
+    );
+    runCase("Restore from Iconify",
+        []()->void {
+            mainWindow->Restore();
+        }
+    );
+    runCase("Maximise",
+        []()->void {
+            mainWindow->Maximise();
+        }
+    );
+    runCase("Restore from Maximise",
+        []()->void {
+            mainWindow->Restore();
+        }
+    );
+    runCase("Maximise before Iconify",
+        []()->void {
+            mainWindow->Maximise();
+        }
+    );
+    runCase("Iconify after Maximise",
+        []()->void {
+            mainWindow->Iconify();
+        }
+    );
+    runCase("Restore from Iconify after Maximise",
+        []()->void {
+            mainWindow->Restore();
+        }
+    );
+    runCase("Restore again",
+        []()->void {
+            mainWindow->Restore();
+        }
+    );
+    runCase("Fullscreen (windowed)",
+        []()->void {
+            mainWindow->SetMonitor(Monitor::GetPrimary());
+        }
+    );
 
     // Enables asking for the result of the ShouldClose step (before this lock ).
     askForShouldCloseResults = true;
@@ -195,13 +205,17 @@ void runTests() {
         mainWindow->SetShouldClose(true);
     });
     // Not asking for the results here, but in the main thread.
-
-    
 }
-void runCase(std::string const& testName, void(*stepFunc)()) {
-    ;
+void runCase(std::string const& testName, TestStep stepFunc) {
+    if (!testsToExecute.empty() && !testsToExecute.contains(testName)) {
+        return;
+    }
+    // Sets the function for the current test step (might be null).
+    setStepFunc(stepFunc);
+    // Ask if the case passed.
+    askForResult(testName);
 }
-void setStepFunc(void(*stepFunc)()) {
+void setStepFunc(TestStep stepFunc) {
     if (shouldAbortTests.load()) return;
 
     testStep = stepFunc;
