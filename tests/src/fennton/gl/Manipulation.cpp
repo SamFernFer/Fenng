@@ -30,7 +30,7 @@ typedef void(*TestStep)();
 Strong<Window> mainWindow = nullptr;
 TestStep lastStep = nullptr;
 std::atomic<TestStep> testStep = nullptr;
-std::atomic<bool> askForShouldCloseResults = false;
+std::atomic<bool> askForDestroyResults = false;
 std::atomic<bool> shouldAbortTests = false;
 
 std::list<std::pair<std::string, bool>> testCases;
@@ -41,6 +41,7 @@ std::unordered_set<std::string> testsToExecute;
 void init();
 void term();
 void runTests();
+bool isCaseEnabled(std::string const& testName);
 void runCase(std::string const& testName, void(*stepFunc)());
 void setStepFunc(void(*stepFunc)());
 void askForResult(std::string const& testName);
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
         // Not need to ask for the result, as reaching this step means it already worked.
         setResult("ShouldClose", true);
 
-        if (!askForShouldCloseResults.load()) {
+        if (!askForDestroyResults.load()) {
             Console::printl();
             shouldAbortTests = true;
         }
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
         mainWindow->Destroy();
 
         // Not asking for the step's result when exiting early.
-        if (askForShouldCloseResults.load()) {
+        if (askForDestroyResults.load() && isCaseEnabled("Destroy")) {
             askForResult("Destroy");
         }
 
@@ -198,16 +199,18 @@ void runTests() {
         }
     );
 
-    // Enables asking for the result of the ShouldClose step (before this lock ).
-    askForShouldCloseResults = true;
+    // Enables asking for the result of the "Destroy" case.
+    askForDestroyResults = true;
     
     setStepFunc([]()->void {
         mainWindow->SetShouldClose(true);
     });
-    // Not asking for the results here, but in the main thread.
+}
+bool isCaseEnabled(std::string const& testName) {
+    return testsToExecute.empty() || testsToExecute.contains(testName);
 }
 void runCase(std::string const& testName, TestStep stepFunc) {
-    if (!testsToExecute.empty() && !testsToExecute.contains(testName)) {
+    if (!isCaseEnabled(testName)) {
         return;
     }
     // Sets the function for the current test step (might be null).
