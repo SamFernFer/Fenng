@@ -97,6 +97,12 @@ namespace Fennton::Gl {
         } else {
             Restore();
         }
+        // Marks the window as fullscreen so that its saved position and dimensions are not 
+        // overwritten and it's possible to restore them later when making it windowed.
+        isFullscreen = monitor != nullptr;
+    }
+    bool Monitor::IsFullscreen() {
+        return isFullscreen;
     }
     void Monitor::monitorCallback(GLFWmonitor* monitor, std::int32_t event) {
         switch (event) {

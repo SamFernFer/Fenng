@@ -12,6 +12,9 @@ namespace Fennton::Gl {
     class Window {
     private:
         GLFWwindow* handle;
+        std::int32_t width, height;
+        std::int32_t xPos, yPos;
+        bool isFullscreen;
         // Returns the GLFW handle for the window. Private, because support for other windowing 
         // frameworks is planned.
         GLFWwindow* GetHandle();
@@ -66,6 +69,8 @@ namespace Fennton::Gl {
         // its video mode. If the monitor is null the window becomes windowed and its previous 
         // monitor gets its previous video mode restored.
         void SetMonitor(Memory::Strong<Monitor> const& monitor);
+        // Returns true if the window is fullscreen on any monitor and false otherwise.
+        bool IsFullscreen();
     };
     class Monitor {
         friend class Window;
