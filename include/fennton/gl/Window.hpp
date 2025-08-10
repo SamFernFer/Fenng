@@ -70,6 +70,7 @@ namespace Fennton::Gl {
     class Monitor {
         friend class Window;
     private:
+        inline static Memory::Strong<Monitor> primary = nullptr;
         // The monitor's handle.
         GLFWmonitor* handle;
         // The monitor's width and height.
@@ -78,6 +79,10 @@ namespace Fennton::Gl {
         std::int32_t redBits, greenBits, blueBits;
         // The monitor's refresh rate.
         std::int32_t refreshRate;
+        // The callback when a monitor is connected or disconnected.
+        static void monitorCallback(GLFWmonitor* monitor, std::int32_t event);
+        // Creates a Monitor object wrapping a GLFW monitor pointer.
+        static Memory::Strong<Monitor> create(GLFWmonitor* handle);
         // Returns the GLFW handle for the monitor. Private, because support for other windowing 
         // frameworks is planned.
         GLFWmonitor* GetHandle();
@@ -87,6 +92,8 @@ namespace Fennton::Gl {
         // to get Strong<Monitor> objects instead, as the constructor is prone to change 
         // based on the backend.
         Monitor(GLFWmonitor* handle);
+        static void init();
+        static void term();
         // Returns the primary monitor, or null if none is found or an error happens.
         static Memory::Strong<Monitor> GetPrimary();
         // Returns the monitor's width.

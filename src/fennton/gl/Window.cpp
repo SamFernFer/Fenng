@@ -98,6 +98,19 @@ namespace Fennton::Gl {
             Restore();
         }
     }
+    void Monitor::monitorCallback(GLFWmonitor* monitor, std::int32_t event) {
+        switch (event) {
+            case GLFW_CONNECTED:
+                break;
+            case GLFW_DISCONNECTED:
+                break;
+            default:
+                break;
+        }
+    }
+    Memory::Strong<Monitor> Monitor::create(GLFWmonitor* handle) {
+        return makeStrong<Monitor>(handle);
+    }
     GLFWmonitor* Monitor::GetHandle() {
         return handle;
     }
@@ -113,8 +126,19 @@ namespace Fennton::Gl {
         this->blueBits = _vidmode->blueBits;
         this->refreshRate = _vidmode->refreshRate;
     }
+    void Monitor::init() {
+        glfwSetMonitorCallback(monitorCallback);
+        GLFWmonitor* _handle = glfwGetPrimaryMonitor();
+        if (_handle) {
+            primary = create(_handle);
+        }
+    }
+    void Monitor::term() {
+        glfwSetMonitorCallback(NULL);
+        primary = nullptr;
+    }
     Strong<Monitor> Monitor::GetPrimary() {
-        return nullptr;
+        return primary;
     }
     std::int32_t Monitor::GetWidth() const {
         return width;

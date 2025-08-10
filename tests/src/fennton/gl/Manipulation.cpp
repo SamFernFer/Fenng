@@ -52,7 +52,15 @@ int main(int argc, char** argv) {
         for (int i = 1; i < argc; ++i) {
             testsToExecute.emplace(argv[i]);
         }
+        if (testsToExecute.contains("--pause-on-preinit")) {
+            Console::pause();
+        }
+
         init();
+
+        if (testsToExecute.contains("--pause-on-init")) {
+            Console::pause();
+        }
 
         mainWindow = Window::create(
             800, // Initial width.
@@ -132,10 +140,14 @@ int main(int argc, char** argv) {
 void init() {
     Console::init();
     Window::init();
+    Monitor::init();
 }
 void term() {
-    // Console::pause();
+    if (testsToExecute.contains("--pause-on-term")) {
+        Console::pause();
+    }
 
+    Monitor::term();
     Window::term();
     Console::term();
 }
@@ -196,6 +208,11 @@ void runTests() {
     runCase("Fullscreen (windowed)",
         []()->void {
             mainWindow->SetMonitor(Monitor::GetPrimary());
+        }
+    );
+    runCase("Restore from Fullscreen (windowed)",
+        []()->void {
+            mainWindow->Restore();
         }
     );
 
