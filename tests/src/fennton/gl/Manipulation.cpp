@@ -48,7 +48,7 @@ void setResult(std::string const& testName, bool success);
 int main(int argc, char** argv) {
     try {
         // Allows for executing only the specified tests, or all of them if none is specified.
-        for (int i = 0; i < argc; ++i) {
+        for (int i = 1; i < argc; ++i) {
             testsToExecute.emplace(argv[i]);
         }
         init();
@@ -133,7 +133,7 @@ void init() {
     Window::init();
 }
 void term() {
-    Console::pause();
+    // Console::pause();
 
     Window::term();
     Console::term();
@@ -242,5 +242,9 @@ void askForResult(std::string const& testName) {
     ++testCount;
 }
 void setResult(std::string const& testName, bool success) {
+    if (!success) {
+        ++failCount;
+    }
+    ++testCount;
     testCases.emplace_back(std::make_pair(testName, success));
 }
