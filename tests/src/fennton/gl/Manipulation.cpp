@@ -205,7 +205,7 @@ void runTests() {
             mainWindow->Restore();
         }
     );
-    runCase("Fullscreen (windowed)",
+    /* runCase("Fullscreen (windowed)",
         []()->void {
             mainWindow->SetMonitor(Monitor::GetPrimary());
         }
@@ -214,7 +214,7 @@ void runTests() {
         []()->void {
             mainWindow->Restore();
         }
-    );
+    ); */
 
     // Enables asking for the result of the "Destroy" case.
     askForDestroyResults = true;

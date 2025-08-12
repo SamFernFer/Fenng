@@ -9,12 +9,13 @@ struct GLFWmonitor;
 namespace Fennton::Gl {
     class Monitor;
 
-    class Window {
+    class Window : public Memory::EnableStrongFromThis<Window> {
     private:
         GLFWwindow* handle;
         std::int32_t width, height;
         std::int32_t xPos, yPos;
-        bool isFullscreen;
+        // Returns a strong pointer to a Window object from its GLFW handle.
+        static Memory::Strong<Window> fromHandle(GLFWwindow* handle);
         // Returns the GLFW handle for the window. Private, because support for other windowing 
         // frameworks is planned.
         GLFWwindow* GetHandle();
@@ -69,13 +70,15 @@ namespace Fennton::Gl {
         // its video mode. If the monitor is null the window becomes windowed and its previous 
         // monitor gets its previous video mode restored.
         void SetMonitor(Memory::Strong<Monitor> const& monitor);
-        // Returns true if the window is fullscreen on any monitor and false otherwise.
-        bool IsFullscreen();
+        // If the window is fullscreen, returns the monitor it is fullscreen on, else returns 
+        // null.
+        Memory::Strong<Monitor> GetMonitor() const;
     };
-    class Monitor {
+    class Monitor : public Memory::EnableStrongFromThis<Monitor> {
         friend class Window;
     private:
-        inline static Memory::Strong<Monitor> primary = nullptr;
+        // The number of connected monitors.
+        static std::int32_t count;
         // The monitor's handle.
         GLFWmonitor* handle;
         // The monitor's width and height.
@@ -88,6 +91,8 @@ namespace Fennton::Gl {
         static void monitorCallback(GLFWmonitor* monitor, std::int32_t event);
         // Creates a Monitor object wrapping a GLFW monitor pointer.
         static Memory::Strong<Monitor> create(GLFWmonitor* handle);
+        // Returns a strong pointer to a Monitor object from its GLFW handle.
+        static Memory::Strong<Monitor> fromHandle(GLFWmonitor* handle);
         // Returns the GLFW handle for the monitor. Private, because support for other windowing 
         // frameworks is planned.
         GLFWmonitor* GetHandle();

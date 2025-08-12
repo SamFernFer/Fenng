@@ -1,3 +1,5 @@
+#include <fennton/utils/Console.hpp>
+
 #include <fennton/gl/Window.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,6 +10,19 @@ using namespace Fennton::Memory;
 namespace Fennton::Gl {
     Window::Window(GLFWwindow* handle) {
         this->handle = handle;
+        glfwSetWindowUserPointer(handle, this);
+    }
+    Strong<Window> Window::fromHandle(GLFWwindow* handle) {
+        if (handle != NULL) {
+            void* _userPtr = glfwGetWindowUserPointer(handle);
+            if (_userPtr) {
+                return static_cast<Window*>(_userPtr)->StrongFromThis();
+            } else {
+                return nullptr;
+            }
+        } else {
+            return nullptr;
+        }
     }
     GLFWwindow* Window::GetHandle() {
         return handle;
@@ -97,21 +112,33 @@ namespace Fennton::Gl {
         } else {
             Restore();
         }
-        // Marks the window as fullscreen so that its saved position and dimensions are not 
-        // overwritten and it's possible to restore them later when making it windowed.
-        isFullscreen = monitor != nullptr;
     }
-    bool Monitor::IsFullscreen() {
-        return isFullscreen;
-    }
+    /* Strong<Monitor> Window::GetMonitor() {
+        return Monitor::fromHandle(glfwGetWindowMonitor(handle));
+    } */
     void Monitor::monitorCallback(GLFWmonitor* monitor, std::int32_t event) {
         switch (event) {
             case GLFW_CONNECTED:
+                Console::print("Connected: ");
                 break;
             case GLFW_DISCONNECTED:
+                Console::print("Disconnected: ");
                 break;
             default:
                 break;
+        }
+        Console::printl(glfwGetMonitorName(monitor));
+    }
+    Memory::Strong<Monitor> Monitor::fromHandle(GLFWmonitor* handle) {
+        if (handle != NULL) {
+            void* _userPtr = glfwGetMonitorUserPointer(handle);
+            if (_userPtr) {
+                return static_cast<Monitor*>(_userPtr)->StrongFromThis();
+            } else {
+                return nullptr;
+            }
+        } else {
+            return nullptr;
         }
     }
     Memory::Strong<Monitor> Monitor::create(GLFWmonitor* handle) {
@@ -122,6 +149,7 @@ namespace Fennton::Gl {
     }
     Monitor::Monitor(GLFWmonitor* handle) {
         this->handle = handle;
+        glfwSetMonitorUserPointer(handle, this);
         // Retrieves the monitor's video mode.
         GLFWvidmode const* _vidmode = glfwGetVideoMode(handle);
         // Stores the monitor's current video mode properties.
@@ -134,17 +162,17 @@ namespace Fennton::Gl {
     }
     void Monitor::init() {
         glfwSetMonitorCallback(monitorCallback);
-        GLFWmonitor* _handle = glfwGetPrimaryMonitor();
-        if (_handle) {
-            primary = create(_handle);
+
+        GLFWmonitor** _monitors = glfwGetMonitors(&count);
+        for (std::int32_t i = 0; i < count; ++i) {
+            create(_monitors[i]);
         }
     }
     void Monitor::term() {
         glfwSetMonitorCallback(NULL);
-        primary = nullptr;
     }
     Strong<Monitor> Monitor::GetPrimary() {
-        return primary;
+        return fromHandle(glfwGetPrimaryMonitor());
     }
     std::int32_t Monitor::GetWidth() const {
         return width;
