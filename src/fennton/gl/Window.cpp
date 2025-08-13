@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <format>
 
 using namespace Fennton::Memory;
 
@@ -11,6 +12,20 @@ namespace Fennton::Gl {
     Window::Window(GLFWwindow* handle) {
         this->handle = handle;
         glfwSetWindowUserPointer(handle, this);
+    }
+    void Window::sizeCallback(
+        GLFWwindow* handle, std::int32_t width, std::int32_t height
+    ) {
+        Strong<Window> _win = fromHandle(handle);
+        _win->width = width;
+        _win->height = height;
+    }
+    void Window::positionCallback(
+        GLFWwindow* handle, std::int32_t xPos, std::int32_t yPos
+    ) {
+        Strong<Window> _win = fromHandle(handle);
+        _win->xPos = xPos;
+        _win->yPos = yPos;
     }
     Strong<Window> Window::fromHandle(GLFWwindow* handle) {
         if (handle != NULL) {
@@ -163,9 +178,14 @@ namespace Fennton::Gl {
     void Monitor::init() {
         glfwSetMonitorCallback(monitorCallback);
 
-        GLFWmonitor** _monitors = glfwGetMonitors(&count);
-        for (std::int32_t i = 0; i < count; ++i) {
-            create(_monitors[i]);
+        std::int32_t _count;
+        GLFWmonitor** _monitors = glfwGetMonitors(&_count);
+        // Initialises the list of monitors with the right size.
+        monitors = std::list<Strong<Monitor>>(_count);
+
+        std::size_t i = 0;
+        for (auto it = monitors.begin(); it != monitors.end(); ++it, ++i) {
+            *it = create(_monitors[i]);
         }
     }
     void Monitor::term() {
@@ -173,6 +193,22 @@ namespace Fennton::Gl {
     }
     Strong<Monitor> Monitor::GetPrimary() {
         return fromHandle(glfwGetPrimaryMonitor());
+    }
+    Strong<Monitor> Monitor::GetMonitor(std::int32_t index) {
+        std::int32_t _count;
+        GLFWmonitor** _monitors = glfwGetMonitors(&_count);
+
+        if (index < 0 || index >= _count) {
+            throw std::runtime_error(std::format(
+                "Monitor: Index {} out of bounds of the monitor list.", index
+            ));
+        }
+        return fromHandle(_monitors[index]);
+    }
+    std::int32_t Monitor::GetMonitorCount() {
+        std::int32_t _count;
+        glfwGetMonitors(&_count);
+        return _count;
     }
     std::int32_t Monitor::GetWidth() const {
         return width;

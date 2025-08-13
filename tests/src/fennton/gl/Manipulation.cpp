@@ -205,16 +205,42 @@ void runTests() {
             mainWindow->Restore();
         }
     );
-    /* runCase("Fullscreen (windowed)",
-        []()->void {
-            mainWindow->SetMonitor(Monitor::GetPrimary());
-        }
-    );
-    runCase("Restore from Fullscreen (windowed)",
-        []()->void {
-            mainWindow->Restore();
-        }
-    ); */
+
+    if (
+        constexpr char const* _name = "Fullscreen (windowed; primary monitor) and back.";
+        isCaseEnabled(_name)
+    ) {
+        setStepFunc(
+            []()->void {
+                mainWindow->SetMonitor(Monitor::GetPrimary());
+            }
+        );
+        std::this_thread::sleep_for(Ms(2000));
+        setStepFunc(
+            []()->void {
+                mainWindow->SetMonitor(nullptr);
+            }
+        );
+        askForResult("Fullscreen (windowed; primary monitor) and back.");
+    }
+
+    if (
+        constexpr char const* _name = "Fullscreen (windowed; first monitor) and back.";
+        isCaseEnabled(_name)
+    ) {
+        setStepFunc(
+            []()->void {
+                mainWindow->SetMonitor(Monitor::GetMonitor(0));
+            }
+        );
+        std::this_thread::sleep_for(Ms(2000));
+        setStepFunc(
+            []()->void {
+                mainWindow->SetMonitor(nullptr);
+            }
+        );
+        askForResult(_name);
+    }
 
     // Enables asking for the result of the "Destroy" case.
     askForDestroyResults = true;

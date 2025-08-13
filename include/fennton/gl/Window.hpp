@@ -2,6 +2,7 @@
 #define FENNTON_GL_WINDOW_HPP
 
 #include <fennton/utils/Memory.hpp>
+#include <list>
 
 struct GLFWwindow;
 struct GLFWmonitor;
@@ -14,6 +15,10 @@ namespace Fennton::Gl {
         GLFWwindow* handle;
         std::int32_t width, height;
         std::int32_t xPos, yPos;
+        // Callback when a window's size changes.
+        static void sizeCallback(GLFWwindow* handle, std::int32_t width, std::int32_t height);
+        // Callback when a window's position changes.
+        static void positionCallback(GLFWwindow* handle, std::int32_t xPos, std::int32_t yPos);
         // Returns a strong pointer to a Window object from its GLFW handle.
         static Memory::Strong<Window> fromHandle(GLFWwindow* handle);
         // Returns the GLFW handle for the window. Private, because support for other windowing 
@@ -77,8 +82,7 @@ namespace Fennton::Gl {
     class Monitor : public Memory::EnableStrongFromThis<Monitor> {
         friend class Window;
     private:
-        // The number of connected monitors.
-        static std::int32_t count;
+        inline static std::list<Memory::Strong<Monitor>> monitors;
         // The monitor's handle.
         GLFWmonitor* handle;
         // The monitor's width and height.
@@ -106,6 +110,10 @@ namespace Fennton::Gl {
         static void term();
         // Returns the primary monitor, or null if none is found or an error happens.
         static Memory::Strong<Monitor> GetPrimary();
+        // Returns the monitor at specified index. Throws if the index is out of bounds.
+        static Memory::Strong<Monitor> GetMonitor(std::int32_t index);
+        // Returns the number of connected monitors.
+        static std::int32_t GetMonitorCount();
         // Returns the monitor's width.
         std::int32_t GetWidth() const;
         // Returns the monitor's height.
