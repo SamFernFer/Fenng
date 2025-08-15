@@ -1,0 +1,32 @@
+800x600: p
+Hide: p
+Show: p
+Iconify: p
+Restore from Iconify: p
+Maximise: p
+Restore from Maximise: p
+Maximise before Iconify: p
+Iconify after Maximise: p
+Restore from Iconify after Maximise: p
+Restore again: p
+Fullscreen (windowed; primary monitor) and back: p
+Fullscreen (windowed; first monitor) and back: p
+Destroy: p
+--------
+                                        800x600: PASS
+                                           Hide: PASS
+                                           Show: PASS
+                                        Iconify: PASS
+                           Restore from Iconify: PASS
+                                       Maximise: PASS
+                          Restore from Maximise: PASS
+                        Maximise before Iconify: PASS
+                         Iconify after Maximise: PASS
+            Restore from Iconify after Maximise: PASS
+                                  Restore again: PASS
+Fullscreen (windowed; primary monitor) and back: PASS
+  Fullscreen (windowed; first monitor) and back: PASS
+                                    ShouldClose: PASS
+                                        Destroy: PASS
+[TOTAL] 0/15 tests failed.
+[RESULT] PASS

@@ -36,7 +36,7 @@ std::atomic<bool> shouldAbortTests = false;
 std::list<std::pair<std::string, bool>> testCases;
 std::int32_t testCount = 0, failCount = 0;
 
-std::unordered_set<std::string> testsToExecute;
+std::unordered_set<std::string> testsToExecute, options;
 
 void init();
 void term();
@@ -50,15 +50,20 @@ int main(int argc, char** argv) {
     try {
         // Allows for executing only the specified tests, or all of them if none is specified.
         for (int i = 1; i < argc; ++i) {
-            testsToExecute.emplace(argv[i]);
+            std::string _arg = argv[i];
+            if (_arg.starts_with("-")) {
+                options.emplace(std::move(_arg));
+            } else {
+                testsToExecute.emplace(std::move(_arg));
+            }
         }
-        if (testsToExecute.contains("--pause-on-preinit")) {
+        if (options.contains("--pause-on-preinit")) {
             Console::pause();
         }
 
         init();
 
-        if (testsToExecute.contains("--pause-on-init")) {
+        if (options.contains("--pause-on-init")) {
             Console::pause();
         }
 
@@ -143,7 +148,7 @@ void init() {
     Monitor::init();
 }
 void term() {
-    if (testsToExecute.contains("--pause-on-term")) {
+    if (options.contains("--pause-on-term")) {
         Console::pause();
     }
 
@@ -207,7 +212,7 @@ void runTests() {
     );
 
     if (
-        constexpr char const* _name = "Fullscreen (windowed; primary monitor) and back.";
+        constexpr char const* _name = "Fullscreen (windowed; primary monitor) and back";
         isCaseEnabled(_name)
     ) {
         setStepFunc(
@@ -221,11 +226,11 @@ void runTests() {
                 mainWindow->SetMonitor(nullptr);
             }
         );
-        askForResult("Fullscreen (windowed; primary monitor) and back.");
+        askForResult(_name);
     }
 
     if (
-        constexpr char const* _name = "Fullscreen (windowed; first monitor) and back.";
+        constexpr char const* _name = "Fullscreen (windowed; first monitor) and back";
         isCaseEnabled(_name)
     ) {
         setStepFunc(

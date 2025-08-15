@@ -17,25 +17,31 @@ namespace Fennton::Gl {
         glfwSetWindowPosCallback(handle, positionCallback);
 
         glfwGetWindowSize(handle, &width, &height);
-        glfwGetWindow
+        glfwGetFramebufferSize(handle, &fbWidth, &fbHeight);
+        glfwGetWindowPos(handle, &xPos, &yPos);
 
         if (glfwGetWindowMonitor(handle) == NULL) {
-            d
+            wWidth = width;
+            wHeight = height;
+            wXPos = xPos;
+            wYPos = yPos;
         } else {
-            d
-        }
+            constexpr std::int32_t defaultWidth = 800, defaultHeight = 600;
+            wWidth = defaultWidth;
+            wHeight = defaultHeight;
 
-        std::int32_t 
-        // Dimensions of the window when windowed. Used to restore the window to its 
-        // previous dimensions when getting out of fullscreen mode.
-        std::int32_t wWidth, wHeight;
-        // Current dimensions of the window's framebuffer.
-        std::int32_t fbWidth, fbHeight;
-        // Current position of the window.
-        std::int32_t xPos, yPos;
-        // Position of the window when windowed. Used to restore the window to its previous 
-        // position when getting out of fullscreen mode.
-        std::int32_t wXPos, wYPos;
+            const Strong<Monitor> _mon = Monitor::GetPrimary();
+
+            if (_mon) {
+                // The centre of the window is at the centre of the screen.
+                wXPos = _mon->GetWidth()/2 - defaultWidth/2;
+                wYPos = _mon->GetHeight()/2 + defaultHeight/2;
+            } else {
+                // If there's no monitor, the position is zero.
+                wXPos = 0;
+                wYPos = 0;
+            }
+        }
     }
     void Window::sizeCallback(
         GLFWwindow* handle, std::int32_t width, std::int32_t height
