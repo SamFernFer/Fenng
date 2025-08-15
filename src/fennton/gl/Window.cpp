@@ -12,20 +12,66 @@ namespace Fennton::Gl {
     Window::Window(GLFWwindow* handle) {
         this->handle = handle;
         glfwSetWindowUserPointer(handle, this);
+        glfwSetWindowSizeCallback(handle, sizeCallback);
+        glfwSetFramebufferSizeCallback(handle, framebufferSizeCallback);
+        glfwSetWindowPosCallback(handle, positionCallback);
+
+        glfwGetWindowSize(handle, &width, &height);
+        glfwGetWindow
+
+        if (glfwGetWindowMonitor(handle) == NULL) {
+            d
+        } else {
+            d
+        }
+
+        std::int32_t 
+        // Dimensions of the window when windowed. Used to restore the window to its 
+        // previous dimensions when getting out of fullscreen mode.
+        std::int32_t wWidth, wHeight;
+        // Current dimensions of the window's framebuffer.
+        std::int32_t fbWidth, fbHeight;
+        // Current position of the window.
+        std::int32_t xPos, yPos;
+        // Position of the window when windowed. Used to restore the window to its previous 
+        // position when getting out of fullscreen mode.
+        std::int32_t wXPos, wYPos;
     }
     void Window::sizeCallback(
         GLFWwindow* handle, std::int32_t width, std::int32_t height
     ) {
         Strong<Window> _win = fromHandle(handle);
+
+        // Current dimensions, in fullscreen or windowed mode.
         _win->width = width;
         _win->height = height;
+        // If the monitor is null, then the window is in windowed mode and its saved windowed 
+        // dimensions must be saved.
+        if (glfwGetWindowMonitor(handle) == NULL) {
+            _win->wWidth = width;
+            _win->wHeight = height;
+        }
+    }
+    void Window::framebufferSizeCallback(
+        GLFWwindow* handle, std::int32_t width, std::int32_t height
+    ) {
+        Strong<Window> _win = fromHandle(handle);
+        _win->fbWidth = width;
+        _win->fbHeight = height;
     }
     void Window::positionCallback(
         GLFWwindow* handle, std::int32_t xPos, std::int32_t yPos
     ) {
         Strong<Window> _win = fromHandle(handle);
+        // Current position, in fullscreen or windowed mode.
         _win->xPos = xPos;
         _win->yPos = yPos;
+        // If the monitor is null, then the window is in windowed mode and its saved windowed 
+        // position must be saved.
+        if (glfwGetWindowMonitor(handle) == NULL) {
+            _win->wXPos = xPos;
+            _win->wYPos = yPos;
+        }
     }
     Strong<Window> Window::fromHandle(GLFWwindow* handle) {
         if (handle != NULL) {
@@ -125,12 +171,48 @@ namespace Fennton::Gl {
                 monitor->GetRefreshRate()
             );
         } else {
-            Restore();
+            glfwSetWindowMonitor(
+                handle, NULL,
+                wXPos, wYPos,
+                wWidth, wHeight,
+                GLFW_DONT_CARE
+            );
         }
     }
-    /* Strong<Monitor> Window::GetMonitor() {
+    Strong<Monitor> Window::GetMonitor() const {
         return Monitor::fromHandle(glfwGetWindowMonitor(handle));
-    } */
+    }
+    std::int32_t Window::GetWidth() const {
+        return width;
+    }
+    std::int32_t Window::GetHeight() const {
+        return height;
+    }
+    std::int32_t Window::GetWindowedWidth() const {
+        return wWidth;
+    }
+    std::int32_t Window::GetWindowedHeight() const {
+        return wHeight;
+    }
+    std::int32_t Window::GetFramebufferWidth() const {
+        return fbWidth;
+    }
+    std::int32_t Window::GetFramebufferHeight() const {
+        return fbHeight;
+    }
+    std::int32_t Window::GetXPosition() const {
+        return xPos;
+    }
+    std::int32_t Window::GetYPosition() const {
+        return yPos;
+    }
+    std::int32_t Window::GetWindowedXPosition() const {
+        return wXPos;
+    }
+    std::int32_t Window::GetWindowedYPosition() const {
+        return wYPos;
+    }
+
     void Monitor::monitorCallback(GLFWmonitor* monitor, std::int32_t event) {
         switch (event) {
             case GLFW_CONNECTED:
@@ -190,6 +272,8 @@ namespace Fennton::Gl {
     }
     void Monitor::term() {
         glfwSetMonitorCallback(NULL);
+        // Clears the list of monitors to free up memory.
+        monitors.clear();
     }
     Strong<Monitor> Monitor::GetPrimary() {
         return fromHandle(glfwGetPrimaryMonitor());

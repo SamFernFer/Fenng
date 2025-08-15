@@ -13,10 +13,25 @@ namespace Fennton::Gl {
     class Window : public Memory::EnableStrongFromThis<Window> {
     private:
         GLFWwindow* handle;
+        // Current dimensions of the window.
         std::int32_t width, height;
+        // Dimensions of the window when windowed. Used to restore the window to its 
+        // previous dimensions when getting out of fullscreen mode.
+        std::int32_t wWidth, wHeight;
+        // Current dimensions of the window's framebuffer.
+        std::int32_t fbWidth, fbHeight;
+        // Current position of the window.
         std::int32_t xPos, yPos;
+        // Position of the window when windowed. Used to restore the window to its previous 
+        // position when getting out of fullscreen mode.
+        std::int32_t wXPos, wYPos;
+
         // Callback when a window's size changes.
         static void sizeCallback(GLFWwindow* handle, std::int32_t width, std::int32_t height);
+        // Callback when a window's framebuffer size changes.
+        static void framebufferSizeCallback(
+            GLFWwindow* handle, std::int32_t width, std::int32_t height
+        );
         // Callback when a window's position changes.
         static void positionCallback(GLFWwindow* handle, std::int32_t xPos, std::int32_t yPos);
         // Returns a strong pointer to a Window object from its GLFW handle.
@@ -78,6 +93,26 @@ namespace Fennton::Gl {
         // If the window is fullscreen, returns the monitor it is fullscreen on, else returns 
         // null.
         Memory::Strong<Monitor> GetMonitor() const;
+        // Returns the width of the window.
+        std::int32_t GetWidth() const;
+        // Returns the height of the window.
+        std::int32_t GetHeight() const;
+        // Returns the width of the window when windowed.
+        std::int32_t GetWindowedWidth() const;
+        // Returns the height of the window when windowed.
+        std::int32_t GetWindowedHeight() const;
+        // Returns the width of the window's framebuffer.
+        std::int32_t GetFramebufferWidth() const;
+        // Returns the height of the window's framebuffer.
+        std::int32_t GetFramebufferHeight() const;
+        // Returns the position of the window in the X axis.
+        std::int32_t GetXPosition() const;
+        // Returns the position of the window in the Y axis.
+        std::int32_t GetYPosition() const;
+        // Returns the windowed position of the window in the X axis.
+        std::int32_t GetWindowedXPosition() const;
+        // Returns the windowed position of the window in the Y axis.
+        std::int32_t GetWindowedYPosition() const;
     };
     class Monitor : public Memory::EnableStrongFromThis<Monitor> {
         friend class Window;
