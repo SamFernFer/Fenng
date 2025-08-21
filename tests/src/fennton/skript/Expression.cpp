@@ -12,6 +12,8 @@ static std::int64_t testCount = 0, failCount = 0;
 void init();
 void term();
 void runTests();
+// Executes an expression and checks if the string version of the result matches the 
+// expected value.
 void testCase();
 int main(int argc, char** argv) {
     try {
@@ -35,8 +37,22 @@ void term() {
     Console::term();
 }
 void runTests() {
-    testCase("", { });
+    // Integers:
+
+    // - Literals:
+    testCase("123", "123");
+
+    // - Basic arithmetics:
+    testCase("2 + 2", "4");
+    testCase("20 + 4 * 0", "20");
+    testCase("(20 + 4) * 0", "0");
+
+    // - Basic comparisons:
+    testCase("20 < 10", "false");
+
+    // - Comparison and arithmetics:
+    testCase("2 + 2 != 5", "true");
 }
-void testCase() {
-    d
+void testCase(std::string const& input, std::string const& expected) {
+    ;
 }
