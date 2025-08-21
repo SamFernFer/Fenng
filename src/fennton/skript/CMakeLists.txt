@@ -1,12 +1,12 @@
-set(ProgramName fennton_utils)
+set(ProgramName fennton_skript)
 
 add_library(${ProgramName} STATIC
-	"Console.cpp"
-	"Text.cpp"
+	"Parser.cpp"
 )
-
+target_link_libraries(${ProgramName} PUBLIC)
 target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
 target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
+
 target_compile_definitions(${ProgramName} PUBLIC
 )
 if(MSVC)
