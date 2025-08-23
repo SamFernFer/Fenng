@@ -41,6 +41,7 @@ void runTests() {
 
     // - Literals:
     testCase("123", "123");
+    testCase("0", "0");
 
     // - Basic arithmetics:
     testCase("2 + 2", "4");
@@ -49,6 +50,7 @@ void runTests() {
 
     // - Basic comparisons:
     testCase("20 < 10", "false");
+    testCase("0 < 2 != #false", "#true");
 
     // - Comparison and arithmetics:
     testCase("2 + 2 != 5", "true");
