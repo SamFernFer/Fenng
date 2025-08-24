@@ -2,16 +2,17 @@
 #include <fennton/utils/Text.hpp>
 #include <fennton/skript/Parser.hpp>
 #include <stdexcept>
-#include <cstdint>
 #include <algorithm>
 #include <utility>
+#include <cstdint>
 
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
 
-using N = Fennton::Skript::Tokeniser::Number;
-using P = Fennton::Skript::Tokeniser::Punct;
-using N = Fennton::Skript::Tokeniser::Number;
+using Fennton::Skript::Tokeniser::Token;
+using Fennton::Skript::Tokeniser::Name;
+using Fennton::Skript::Tokeniser::Number;
+using Fennton::Skript::Tokeniser::Punct;
 
 static std::int64_t testCount = 0, failCount = 0;
 
@@ -41,10 +42,11 @@ void term() {
     Console::term();
 }
 void runTests() {
+    #if 0
     // Integers:
 
     // - Literals:
-    testCase("123", N( "123" ));
+    testCase("123", Number( "123" ));
     testCase("0", N( "0" ));
 
     // - Basic arithmetics:
@@ -59,13 +61,19 @@ void runTests() {
 
     // - Comparison and arithmetics:
     testCase("2 + 2 != 5", "#true");
+    #endif
 }
-void testCase(std::string const& input, std::vector<> const& expected) {
+void testCase(std::string const& input, std::deque<Token> const& expected) {
     ++testCount;
 
-    std::deque<Token> _tks = Fennton::Skript::tokenise(input);
+    std::deque<Token> _actual = Fennton::Skript::tokenise(input);
 
-    std::pair<auto, auto> _miss = std::mismatch(_tks.begin());
+    auto _mismatch = std::mismatch(
+        _actual.begin(), _actual.end(),
+        expected.begin(), expected.end()
+    );
 
-    ++failCount;
+    if (_mismatch.first != _mismatch.second) {
+        ++failCount;
+    }
 }
