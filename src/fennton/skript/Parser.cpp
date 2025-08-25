@@ -1,5 +1,7 @@
 #include <fennton/skript/Parser.hpp>
+#include <utility>
 #include <type_traits>
+#include <stdexcept>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
@@ -8,6 +10,9 @@ namespace Fennton::Skript {
         }
         bool Name::operator!=(Name const& other) const {
             return !(*this == other);
+        }
+        std::string Name::GetSpelling() const {
+            throw std::runtime_error("Not implemented yet.");
         }
 
         bool Number::operator==(Number const& other) const {
@@ -18,6 +23,9 @@ namespace Fennton::Skript {
         }
         bool Number::operator!=(Number const& other) const {
             return !(*this == other);
+        }
+        std::string Number::GetSpelling() const {
+            throw std::runtime_error("Not implemented yet.");
         }
         std::vector<std::string_view> const& Number::GetParts() const {
             return parts;
@@ -35,6 +43,9 @@ namespace Fennton::Skript {
         bool String::operator!=(String const& other) const {
             return !(*this == other);
         }
+        std::string String::GetSpelling() const {
+            throw std::runtime_error("Not implemented yet.");
+        }
 
         bool Punct::operator==(Punct const& other) const {
             return false;
@@ -42,17 +53,16 @@ namespace Fennton::Skript {
         bool Punct::operator!=(Punct const& other) const {
             return !(*this == other);
         }
+        std::string Punct::GetSpelling() const {
+            throw std::runtime_error("Not implemented yet.");
+        }
 
-        std::string const& Token::GetSpelling() const {
-            std::visit([](auto&& arg){
-                using T = std::decay_t<decltype(arg)>;
-                if (std::is_same<T, >) {
-                } else {
-                    f
-                }
+        std::string Token::GetSpelling() const {
+            return std::visit([](auto&& arg){
+                return arg.GetSpelling();
             }, var);
         }
-        bool HasSpaceAfter() const {
+        constexpr bool Token::HasSpaceAfter() {
             return flags & (1<<spaceAfterBit);
         }
     }

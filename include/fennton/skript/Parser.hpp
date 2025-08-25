@@ -12,6 +12,9 @@ namespace Fennton::Skript {
         public:
             bool operator==(Name const& other) const;
             bool operator!=(Name const& other) const;
+            // Returns the token's spelling, not exactly equal to how it was spelled in the 
+            // source, but which generates the same token if retokenised.
+            std::string GetSpelling() const;
         };
         class Number {
         private:
@@ -28,6 +31,9 @@ namespace Fennton::Skript {
             Number();
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
+            // Returns the token's spelling, not exactly equal to how it was spelled in the 
+            // source, but which generates the same token if retokenised.
+            std::string GetSpelling() const;
             std::vector<std::string_view> const& GetParts() const;
             std::vector<std::string_view> const& GetSuffixes() const;
             std::int32_t GetBase() const;
@@ -36,11 +42,17 @@ namespace Fennton::Skript {
         public:
             bool operator==(String const& other) const;
             bool operator!=(String const& other) const;
+            // Returns the token's spelling, not exactly equal to how it was spelled in the 
+            // source, but which generates the same token if retokenised.
+            std::string GetSpelling() const;
         };
         class Punct {
         public:
             bool operator==(Punct const& other) const;
             bool operator!=(Punct const& other) const;
+            // Returns the token's spelling, not exactly equal to how it was spelled in the 
+            // source, but which generates the same token if retokenised.
+            std::string GetSpelling() const;
         };
         class Token {
         public:
@@ -48,9 +60,17 @@ namespace Fennton::Skript {
         private:
             VariantType var;
             std::uint8_t flags;
+
+            template<typename T> Token(T const& innerVal) {
+                var = innerVal;
+            }
+
+            Token(Token const&) = delete;
+            Token(Token&&) = delete;
+            Token& operator=(Token const& other) = delete;
+            Token& operator=(Token&& other) = delete;
         public:
-            constexpr std::int32_t spaceAfterBit = 0;
-            Token();
+            static constexpr std::int32_t spaceAfterBit = 0;
             // Compares two tokens for equality.
             bool operator==(Token const& other) const {
                 return var == other.var;
@@ -61,10 +81,10 @@ namespace Fennton::Skript {
             }
             // Returns the token's spelling, not exactly equal to how it was spelled in the 
             // source, but which generates the same token if retokenised.
-            std::string const& GetSpelling() const;
+            std::string GetSpelling() const;
             // Returns true if there is a space between this token and the next and false if 
             // there is either no space or no token.
-            bool HasSpaceAfter() const;
+            constexpr bool HasSpaceAfter();
         };
     };
     std::deque<Tokeniser::Token> tokenise(std::string_view str);
