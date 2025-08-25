@@ -1,9 +1,10 @@
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
 #include <fennton/skript/Parser.hpp>
-#include <stdexcept>
 #include <algorithm>
+#include <iterator>
 #include <utility>
+#include <stdexcept>
 #include <cstdint>
 
 namespace Console = Fennton::Console;
@@ -46,18 +47,23 @@ void runTests() {
     // Integers:
 
     // - Literals:
-    testCase("123", Number( "123" ));
+    testCase("123", Number( { "123" }, 10, {} ));
     testCase("0", N( "0" ));
 
     // - Basic arithmetics:
     testCase("-20", "-20");
     testCase("2 + 2", "4");
+    testCase("2 + -2", "0");
+    testCase("2 - 2", "0");
+    testCase("2 -2", "0");
     testCase("20 + 4 * 0", "20");
     testCase("(20 + 4) * 0", "0");
 
     // - Basic comparisons:
     testCase("20 < 10", "#false");
+    testCase("10 > 20", "#false");
     testCase("0 < 2 != #false", "#true");
+    testCase("#false != 0 < 2", "#true");
 
     // - Comparison and arithmetics:
     testCase("2 + 2 != 5", "#true");
@@ -74,6 +80,7 @@ void testCase(std::string const& input, std::deque<Token> const& expected) {
     );
 
     if (_mismatch.first != _mismatch.second) {
+        Console::printl("[FAIL] Index {}", std::distance(_actual.begin(), _mismatch.first));
         ++failCount;
     }
 }

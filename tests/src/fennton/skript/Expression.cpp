@@ -44,16 +44,22 @@ void runTests() {
     testCase("0", "0");
 
     // - Basic arithmetics:
+    testCase("-20", "-20");
     testCase("2 + 2", "4");
+    testCase("2 + -2", "0");
+    testCase("2 - 2", "0");
+    testCase("2 -2", "0");
     testCase("20 + 4 * 0", "20");
     testCase("(20 + 4) * 0", "0");
 
     // - Basic comparisons:
-    testCase("20 < 10", "false");
+    testCase("20 < 10", "#false");
+    testCase("10 > 20", "#false");
     testCase("0 < 2 != #false", "#true");
+    testCase("#false != 0 < 2", "#true");
 
     // - Comparison and arithmetics:
-    testCase("2 + 2 != 5", "true");
+    testCase("2 + 2 != 5", "#true");
 }
 void testCase(std::string const& input, std::string const& expected) {
     ;
