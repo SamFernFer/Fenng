@@ -2,7 +2,8 @@
 #include <utility>
 #include <type_traits>
 #include <stdexcept>
-#include <ctype>
+#include <locale>
+#include <cctype>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
@@ -16,6 +17,19 @@ namespace Fennton::Skript {
             throw std::runtime_error("Not implemented yet.");
         }
 
+        Number(
+            std::string const& storage,
+            std::vector<std::string_view> const& parts,
+            std::vector<std::string_view> const& suffixes,
+            std::int32_t base
+        ) {
+        }
+        Number(
+            std::vector<std::string_view> const& parts,
+            std::vector<std::string_view> const& suffixes,
+            std::int32_t base
+        ) {
+        }
         bool Number::operator==(Number const& other) const {
             return
                 (parts == other.parts)
@@ -67,8 +81,21 @@ namespace Fennton::Skript {
             return hasSpaceAfter;
         }
 
-        std::deque<Tokeniser::Token> tokenise(std::string_view str) {
-            ;
+        bool isPunct(char c) {
+            return c != '_' && std::ispunct(c, std::locale::classic());
+        }
+        bool isDigit(char c) {
+            return std::isdigit(c, std::locale::classic());
+        }
+        bool isSpace(char c) {
+            return std::isspace(c, std::locale::classic());
+        }
+        bool isControl(char c) {
+            return std::iscntrl(c, std::locale::classic());
+        }
+        std::deque<Token> tokenise(std::string_view str) {
+            std::deque<Token> _tokens;
+            return std::move(_tokens);
         }
     }
 }

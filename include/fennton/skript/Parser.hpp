@@ -28,7 +28,19 @@ namespace Fennton::Skript {
             // The number's base.
             std::int32_t base;
         public:
-            Number();
+            // Constructor with explicit storage.
+            Number(
+                std::string const& storage,
+                std::vector<std::string_view> const& parts,
+                std::vector<std::string_view> const& suffixes,
+                std::int32_t base
+            );
+            // Construtor with the storage string built automatically.
+            Number(
+                std::vector<std::string_view> const& parts,
+                std::vector<std::string_view> const& suffixes,
+                std::int32_t base
+            );
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
             // Returns the token's spelling, not exactly equal to how it was spelled in the 
@@ -86,7 +98,21 @@ namespace Fennton::Skript {
             // there is either no space or no token.
             constexpr bool HasSpaceAfter();
         };
-        // Tokenises the string into a deque. The tokens do not depend on the original string, 
+        // Returns true if the character is in the !"#$%&'()*+,-./:;<=>?@[\]^`{|}~ set (the set 
+        // of punctuation defined by the classic C locale, minus the `_` character), else returns 
+        // false.
+        bool isPunct(char c);
+        // Returns true if the character is a decimal digit (in the 0123456789 set), else returns 
+        // false.
+        bool isDigit(char c);
+        // Returns true if the character is whitespace, in the set: 0x20 (' ', space), 
+        // 0x0c ('\f', form feed), 0x0a ('\n', line feed), 0x0d ('\r', carriage return), 
+        // 0x09 ('\t', horizontal tab), 0x0b ('\v', vertical tab). Else, returns false.
+        bool isSpace(char c);
+        // Returns true if the character is a control character (the set include some 
+        // character classified as whitespace), else returns false.
+        bool isControl(char c);
+        // Tokenises the string into a deque and returns it. The tokens do not depend on the original string, 
         // so it is free to deallocate it.
         std::deque<Tokeniser::Token> tokenise(std::string_view str);
     };

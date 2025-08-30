@@ -16,13 +16,9 @@ using Fennton::Skript::Tokeniser::Token;
 using Fennton::Skript::Tokeniser::Name;
 using Fennton::Skript::Tokeniser::Number;
 using Fennton::Skript::Tokeniser::Punct;
-using Fennton::Skript::tokenise;
+using Fennton::Skript::Tokeniser::tokenise;
 
 static std::int64_t testCount = 0, failCount = 0;
-
-template<typename T, typename... A> tk() {
-    return f
-}
 
 void init();
 void term();
@@ -50,7 +46,7 @@ void term() {
     Console::term();
 }
 void runTests() {
-    testCase("123", Number( { "123" }, 10, {} ));
+    testCase("123", Number( { "123" }, {}, 10));
     #if 0
     // Integers:
 
@@ -79,7 +75,7 @@ void runTests() {
 void testCase(std::string const& input, std::deque<Token> const& expected) {
     ++testCount;
 
-    std::deque<Token> const _actual = Fennton::Skript::Tokeniser::tokenise(input);
+    std::deque<Token> const _actual = tokenise(input);
 
     auto _mismatch = std::mismatch(
         _actual.begin(), _actual.end(),
