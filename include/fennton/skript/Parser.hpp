@@ -59,7 +59,7 @@ namespace Fennton::Skript {
             using VariantType = std::variant<Name, Number, String, Punct>;
         private:
             VariantType var;
-            std::uint8_t flags;
+            bool hasSpaceAfter;
 
             template<typename T> Token(T const& innerVal) {
                 var = innerVal;
@@ -86,6 +86,8 @@ namespace Fennton::Skript {
             // there is either no space or no token.
             constexpr bool HasSpaceAfter();
         };
+        // Tokenises the string into a deque. The tokens do not depend on the original string, 
+        // so it is free to deallocate it.
+        std::deque<Tokeniser::Token> tokenise(std::string_view str);
     };
-    std::deque<Tokeniser::Token> tokenise(std::string_view str);
 }

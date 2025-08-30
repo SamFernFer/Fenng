@@ -2,6 +2,7 @@
 #include <utility>
 #include <type_traits>
 #include <stdexcept>
+#include <ctype>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
@@ -63,10 +64,11 @@ namespace Fennton::Skript {
             }, var);
         }
         constexpr bool Token::HasSpaceAfter() {
-            return flags & (1<<spaceAfterBit);
+            return hasSpaceAfter;
         }
-    }
-    std::deque<Tokeniser::Token> tokenise(std::string_view str) {
-        return {};
+
+        std::deque<Tokeniser::Token> tokenise(std::string_view str) {
+            ;
+        }
     }
 }
