@@ -73,16 +73,16 @@ namespace Fennton::Skript {
             VariantType var;
             bool hasSpaceAfter;
 
+        public:
+            // static constexpr std::int32_t spaceAfterBit = 0;
+
+            Token(Token const&) = default;
+            Token(Token&&) = default;
             template<typename T> Token(T const& innerVal) {
                 var = innerVal;
             }
-
-            Token(Token const&) = delete;
-            Token(Token&&) = delete;
-            Token& operator=(Token const& other) = delete;
-            Token& operator=(Token&& other) = delete;
-        public:
-            static constexpr std::int32_t spaceAfterBit = 0;
+            Token& operator=(Token const& other) = default;
+            Token& operator=(Token&& other) = default;
             // Compares two tokens for equality.
             bool operator==(Token const& other) const {
                 return var == other.var;

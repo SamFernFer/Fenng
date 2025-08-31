@@ -23,7 +23,7 @@ static std::int64_t testCount = 0, failCount = 0;
 void init();
 void term();
 void runTests();
-void testCase();
+void testCase(std::string const& input, std::deque<Token> const& expected);
 int main(int argc, char** argv) {
     try {
         init();
@@ -46,7 +46,7 @@ void term() {
     Console::term();
 }
 void runTests() {
-    testCase("123", Number( { "123" }, {}, 10));
+    testCase("123", { Number( { "123" }, {}, 10) });
     #if 0
     // Integers:
 
