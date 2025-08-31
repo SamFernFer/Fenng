@@ -104,7 +104,10 @@ void testCase(std::string const& input, std::deque<Token> const& expected) {
         }
     };
 
-    if (_mismatch.first != _mismatch.second) {
+    if (
+        _mismatch.first != _actual.end()
+        || _mismatch.second != expected.end()
+    ) {
         Console::printl("[FAIL] Index {}", std::distance(_actual.begin(), _mismatch.first));
         Console::printl("[ACTUAL] [{}]", _listElems(_mismatch.first, _actual.end()));
         Console::printl("[EXPECTED] [{}]", _listElems(_mismatch.second, expected.end()));

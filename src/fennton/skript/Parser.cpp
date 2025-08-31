@@ -1,6 +1,7 @@
 #include <fennton/skript/Parser.hpp>
 #include <utility>
 #include <algorithm>
+#include <format>
 #include <locale>
 #include <stdexcept>
 #include <cctype>
@@ -76,7 +77,92 @@ namespace Fennton::Skript {
             return !(*this == other);
         }
         std::string Number::GetSpelling() const {
-            throw std::runtime_error("Not implemented yet.");
+            // Base size.
+            std::size_t _size = storage.size();
+            // If there is more than one part, then reserves space for the radixes.
+            if (parts.size() > 1) { _size += parts.size() - 1; }
+            // If there is more than one suffix, then reserves space for the 
+            // suffix separators.
+            if (suffixes.size() > 1) { _size += suffixes.size() - 1; }
+            // Increases the size based on the base and its necessary prefixes or delimiters.
+            switch (base) {
+                case 2:
+                    // Space for the base prefix ("0b").
+                    _size += 2;
+                    break;
+                case 8:
+                    // Space for the base prefix ("0").
+                    _size += 1;
+                    break;
+                case 10:
+                    // No prefix.
+                    break;
+                case 16:
+                    // Space for the base prefix ("0x") and for the radix followed by a 
+                    // suffix/number separator (".'"), necessary before the suffix list, 
+                    // as a base-16 number includes letters.
+                    _size += 4;
+                    break;
+                default:
+                    throw std::runtime_error(std::format(
+                        "Number::GetSpelling: Base {} is unsupported.", base
+                    ));
+            }
+            // Allocates the spelling string a single time with the correct size.
+            std::string _spelling = std::string(_size, '#');
+            // Iterator to the beginning of the spelling string.
+            std::string::iterator _spellingIt = _spelling.begin();
+            switch (base) {
+                // Prefix "0b".
+                case 2:
+                    *(_spellingIt++) = '0';
+                    *(_spellingIt++) = 'b';
+                    break;
+                // Prefix "0".
+                case 8:
+                    *(_spellingIt++) = '0';
+                    break;
+                // Prefix "0x".
+                case 16:
+                    *(_spellingIt++) = '0';
+                    *(_spellingIt++) = 'x';
+                    break;
+                // No need for a default case, as unsupported bases have already been handled.
+            }
+            // Writes the number's parts.
+            if (parts.size() > 0) {
+                // Iterator to the beginning of the parts vector.
+                auto _partsIt = parts.begin();
+                // Copies the first part to the spelling string and updates the spelling 
+                // iterator.
+                _spellingIt = std::copy(_partsIt->begin(), _partsIt->end(), _spellingIt);
+                // Moves to the second part. The loop automatically prevents using a non-
+                // -existent second part.
+                ++_partsIt;
+                for (; _partsIt != parts.cend(); ++_partsIt) {
+                    // Writes the radix and increments the spelling iterator.
+                    *(_spellingIt++) = '.';
+                    // Writes the part and updates the spelling iterator.
+                    _spellingIt = std::copy(_partsIt->begin(), _partsIt->end(), _spellingIt);
+                }
+            }
+            // Writes the number's suffixes.
+            if (suffixes.size() > 0) {
+                // Iterator to the beginning of the suffixes vector.
+                auto _suffixesIt = suffixes.begin();
+                // Copies the first suffix to the spelling string and updates the 
+                // spelling iterator.
+                _spellingIt = std::copy(_suffixesIt->begin(), _suffixesIt->end(), _spellingIt);
+                // Moves to the second suffix. The loop automatically prevents using a non-
+                // -existent second suffix.
+                for (; _suffixesIt != suffixes.end(); ++_suffixesIt) {
+                    // Writes the suffix separator and increments the spelling iterator.
+                    *(_spellingIt++) = '\'';
+                    // Writes the part and updates the spelling iterator.
+                    _spellingIt = std::copy(_suffixesIt->begin(), _suffixesIt->end(), _spellingIt);
+                }
+            }
+            return std::move(_spelling);
         }
         std::vector<std::string_view> const& Number::GetParts() const {
             return parts;
