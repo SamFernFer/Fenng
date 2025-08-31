@@ -47,6 +47,9 @@ void term() {
 }
 void runTests() {
     testCase("123", { Number( { "123" }, {}, 10) });
+    testCase("123u8", { Number( { "123" }, { "u8" }, 10) });
+    testCase("123u1", { Number( { "123" }, { "u1" }, 10) });
+    testCase("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) });
     #if 0
     // Integers:
 

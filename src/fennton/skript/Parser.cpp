@@ -71,6 +71,7 @@ namespace Fennton::Skript {
             return
                 (parts == other.parts)
                 && (suffixes == other.suffixes)
+                && (base == other.base)
             ;
         }
         bool Number::operator!=(Number const& other) const {
@@ -146,6 +147,10 @@ namespace Fennton::Skript {
                     _spellingIt = std::copy(_partsIt->begin(), _partsIt->end(), _spellingIt);
                 }
             }
+            if (base == 16) {
+                *(_spellingIt++) = '.';
+                *(_spellingIt++) = '\'';
+            }
             // Writes the number's suffixes.
             if (suffixes.size() > 0) {
                 // Iterator to the beginning of the suffixes vector.
@@ -155,6 +160,7 @@ namespace Fennton::Skript {
                 _spellingIt = std::copy(_suffixesIt->begin(), _suffixesIt->end(), _spellingIt);
                 // Moves to the second suffix. The loop automatically prevents using a non-
                 // -existent second suffix.
+                ++_suffixesIt;
                 for (; _suffixesIt != suffixes.end(); ++_suffixesIt) {
                     // Writes the suffix separator and increments the spelling iterator.
                     *(_spellingIt++) = '\'';
