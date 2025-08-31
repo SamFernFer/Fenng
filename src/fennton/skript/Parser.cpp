@@ -34,7 +34,6 @@ namespace Fennton::Skript {
             std::int32_t base
         ) {
             // The base can be set without worrying about the storage string.
-            this->base = base;
             {
                 std::size_t _totalSize = 0;
                 for (std::string_view s : parts) { _totalSize += s.size(); }
@@ -43,12 +42,28 @@ namespace Fennton::Skript {
                 // need for multiple allocations.
                 this->storage = std::string(_totalSize, '#');
             }
-            std::string::iterator it = this->storage.begin();
-            for (std::string_view s : parts) {
-                it = std::copy(s.begin(), s.end(), it);
+            this->parts = std::vector<std::string_view>(parts.size());
+            this->suffixes = std::vector<std::string_view>(suffixes.size());
+            this->base = base;
+
+            std::string::iterator _it = this->storage.begin();
+            for (std::size_t i = 0; i < parts.size(); ++i) {
+                std::string_view _s = parts[i];
+
+                std::string::iterator _oldIt = _it;
+                _it = std::copy(_s.begin(), _s.end(), _it);
+
+                // Uses the previous iterator and the current one to constuct the string_view.
+                this->parts[i] = std::string_view(_oldIt, _it);
             }
-            for (std::string_view s : suffixes) {
-                it = std::copy(s.begin(), s.end(), it);
+            for (std::size_t i = 0; i < suffixes.size(); ++i) {
+                std::string_view _s = suffixes[i];
+
+                std::string::iterator _oldIt = _it;
+                _it = std::copy(_s.begin(), _s.end(), _it);
+
+                // Uses the previous iterator and the current one to constuct the string_view.
+                this->suffixes[i] = std::string_view(_oldIt, _it);
             }
         }
         bool Number::operator==(Number const& other) const {
