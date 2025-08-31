@@ -1,9 +1,8 @@
 #include <fennton/skript/Parser.hpp>
 #include <utility>
-#include <type_traits>
-#include <stdexcept>
-#include <utility>
+#include <algorithm>
 #include <locale>
+#include <stdexcept>
 #include <cctype>
 
 namespace Fennton::Skript {
@@ -34,32 +33,23 @@ namespace Fennton::Skript {
             std::vector<std::string_view> const& suffixes,
             std::int32_t base
         ) {
-            std::vector<std::pair<std::size_t, std::size_t>>
-                // Vector of index ranges on the storage string, so that it is possible to 
-                // generate the vector of parts later.
-                _partsRanges(parts.size()),
-                // Vector of index ranges on the storage string for the suffixes, for the 
-                // same reason.
-                _suffixesRanges(suffixes.size())
-            ;
-
-            std::size_t _currIndexOnStorage = 0;
-            // storage has already been default-initialised, so it is safe to apped to it.
-            // Also, the number of parts is usually small, so there is not need for a 
-            // stringstream.
-            for (std::size_t i = 0; i < parts.size(); ++i) {
-                std::string_view _s = parts[i];
-                std::pair<std::size_t, std::size_t>& _range = _partsRanges[i];
-                
-                _range.first = _currIndexOnStorage;
-                _currIndexOnStorage += _s.size();
-                _range.second = _currIndexOnStorage;
-                // Appends each part to storage.
-                storage.append(s);
-            }
-            this->parts = parts;
-            this->suffixes = suffixes;
+            // The base can be set without worrying about the storage string.
             this->base = base;
+            {
+                std::size_t _totalSize = 0;
+                for (std::string_view s : parts) { _totalSize += s.size(); }
+                for (std::string_view s : suffixes) { _totalSize += s.size(); }
+                // Reconstructs the storage string with the correct size, so that there is no 
+                // need for multiple allocations.
+                this->storage = std::string(_totalSize, '#');
+            }
+            std::string::iterator it = this->storage.begin();
+            for (std::string_view s : parts) {
+                it = std::copy(s.begin(), s.end(), it);
+            }
+            for (std::string_view s : suffixes) {
+                it = std::copy(s.begin(), s.end(), it);
+            }
         }
         bool Number::operator==(Number const& other) const {
             return
