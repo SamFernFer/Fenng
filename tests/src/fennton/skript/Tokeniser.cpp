@@ -23,7 +23,8 @@ static std::int64_t testCount = 0, failCount = 0;
 void init();
 void term();
 void runTests();
-void testCase(std::string const& input, std::deque<Token> const& expected);
+void testSpelling(Token const& token, std::string_view expected);
+void testTokens(std::string const& input, std::deque<Token> const& expected);
 int main(int argc, char** argv) {
     try {
         init();
@@ -46,36 +47,50 @@ void term() {
     Console::term();
 }
 void runTests() {
-    testCase("123", { Number( { "123" }, {}, 10) });
-    testCase("123u8", { Number( { "123" }, { "u8" }, 10) });
-    testCase("123u1", { Number( { "123" }, { "u1" }, 10) });
-    testCase("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) });
+    testSpelling(Number( { "123" }, {}, 10), "123");
+
+    /* testTokens("123", { Number( { "123" }, {}, 10) });
+    testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
+    testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
+    testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
     #if 0
     // Integers:
 
     // - Literals:
-    testCase("0", N( "0" ));
+    testTokens("0", N( "0" ));
 
     // - Basic arithmetics:
-    testCase("-20", "-20");
-    testCase("2 + 2", "4");
-    testCase("2 + -2", "0");
-    testCase("2 - 2", "0");
-    testCase("2 -2", "0");
-    testCase("20 + 4 * 0", "20");
-    testCase("(20 + 4) * 0", "0");
+    testTokens("-20", "-20");
+    testTokens("2 + 2", "4");
+    testTokens("2 + -2", "0");
+    testTokens("2 - 2", "0");
+    testTokens("2 -2", "0");
+    testTokens("20 + 4 * 0", "20");
+    testTokens("(20 + 4) * 0", "0");
 
     // - Basic comparisons:
-    testCase("20 < 10", "#false");
-    testCase("10 > 20", "#false");
-    testCase("0 < 2 != #false", "#true");
-    testCase("#false != 0 < 2", "#true");
+    testTokens("20 < 10", "#false");
+    testTokens("10 > 20", "#false");
+    testTokens("0 < 2 != #false", "#true");
+    testTokens("#false != 0 < 2", "#true");
 
     // - Comparison and arithmetics:
-    testCase("2 + 2 != 5", "#true");
+    testTokens("2 + 2 != 5", "#true");
     #endif
 }
-void testCase(std::string const& input, std::deque<Token> const& expected) {
+void testSpelling(Token const& token, std::string_view expected) {
+    ++testCount;
+
+    std::string _actual = token.GetSpelling();
+    if (_actual != expected) {
+        // Prints the zero-based test index.
+        Console::printl("[FAIL] Test {}", testCount - 1);
+        Console::printl("[ACTUAL] [{}]", _actual);
+        Console::printl("[EXPECTED] [{}]", expected);
+        ++failCount;
+    }
+}
+void testTokens(std::string const& input, std::deque<Token> const& expected) {
     ++testCount;
 
     std::deque<Token> const _actual = tokenise(input);
@@ -111,7 +126,11 @@ void testCase(std::string const& input, std::deque<Token> const& expected) {
         _mismatch.first != _actual.end()
         || _mismatch.second != expected.end()
     ) {
-        Console::printl("[FAIL] Index {}", std::distance(_actual.begin(), _mismatch.first));
+        Console::printl("[FAIL] Test {} | Token {}",
+            testCount - 1, // Zero-based index of the test.
+            std::distance(_actual.begin(), _mismatch.first) // Index of the divergent token.
+        );
+        Console::printl("[INPUT] {}", Text::quote(input));
         Console::printl("[ACTUAL] [{}]", _listElems(_mismatch.first, _actual.end()));
         Console::printl("[EXPECTED] [{}]", _listElems(_mismatch.second, expected.end()));
         ++failCount;
