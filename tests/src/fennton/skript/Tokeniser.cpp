@@ -8,6 +8,7 @@
 #include <sstream>
 #include <concepts>
 #include <stdexcept>
+#include <typeinfo>
 #include <cstdint>
 
 namespace Console = Fennton::Console;
@@ -32,11 +33,22 @@ template<std::derived_from<Exception> ExceptionType>
 void testSpelling(Token const& token, ExceptionType const& exception) {
     ++testCount;
     try {
+        // Gets the spelling.
+        std::string _spelling = token.GetSpelling();
+        // Failed because there was no exception.
+        Console::printl("[FAIL] Test {}", testCount - 1);
+        Console::printl("[ACTUAL] Spelling: {}", Text::quote(_spelling));
+        Console::printl("[EXPECTED] ");
     } catch (ExceptionType const& e) {
+        // Zero-based index of the test.
+        Console::printl("[FAIL] Test {}", testCount - 1);
+        Console::printl("[ACTUAL] {} | {}" typeid(e).name(), e.what());
+        Console::printl("[EXPECTED] {} | {}" typeid(ExceptionType).name(), exception.what());
     } catch (...) {
         // Zero-based index of the test.
         Console::printl("[FAIL] Test {}", testCount - 1);
-        Console::printl("[EXPECTED]");
+        Console::printl("[ACTUAL] Unknown exception.");
+        Console::printl("[EXPECTED] {} | {}" typeid(ExceptionType).name(), exception.what());
     }
 }
 // Tests the tokenisation of a string.
@@ -117,46 +129,56 @@ void testSpelling(Token const& token, std::string_view expected) {
 void testTokens(std::string const& input, std::deque<Token> const& expected) {
     ++testCount;
 
-    std::deque<Token> const _actual = tokenise(input);
+    try {
+        std::deque<Token> const _actual = tokenise(input);
 
-    auto _mismatch = std::mismatch(
-        _actual.begin(), _actual.end(),
-        expected.begin(), expected.end()
-    );
-
-    using ItType = decltype(_mismatch.first);
-
-    auto _listElems = [](ItType _begin, ItType _end)->std::string {
-        std::stringstream _ss;
-        if (_begin != _end) {
-            _ss << " ";
-            _ss << _begin->GetSpelling();
-            for (
-                auto it = std::next(_begin);
-                it != _end;
-                ++it
-            ) {
-                _ss << ", ";
-                _ss << it->GetSpelling();
-            }
-            _ss << " ";
-            return _ss.str();
-        } else {
-            return {};
-        }
-    };
-
-    if (
-        _mismatch.first != _actual.end()
-        || _mismatch.second != expected.end()
-    ) {
-        Console::printl("[FAIL] Test {} | Token {}",
-            testCount - 1, // Zero-based index of the test.
-            std::distance(_actual.begin(), _mismatch.first) // Index of the divergent token.
+        auto _mismatch = std::mismatch(
+            _actual.begin(), _actual.end(),
+            expected.begin(), expected.end()
         );
+
+        using ItType = decltype(_mismatch.first);
+
+        auto _listElems = [](ItType _begin, ItType _end)->std::string {
+            std::stringstream _ss;
+            if (_begin != _end) {
+                _ss << " ";
+                _ss << _begin->GetSpelling();
+                for (
+                    auto it = std::next(_begin);
+                    it != _end;
+                    ++it
+                ) {
+                    _ss << ", ";
+                    _ss << it->GetSpelling();
+                }
+                _ss << " ";
+                return _ss.str();
+            } else {
+                return {};
+            }
+        };
+
+        if (
+            _mismatch.first != _actual.end()
+            || _mismatch.second != expected.end()
+        ) {
+            Console::printl("[FAIL] Test {} | Token {}",
+                testCount - 1, // Zero-based index of the test.
+                std::distance(_actual.begin(), _mismatch.first) // Index of the divergent token.
+            );
+            Console::printl("[INPUT] {}", Text::quote(input));
+            Console::printl("[ACTUAL] [{}]", _listElems(_mismatch.first, _actual.end()));
+            Console::printl("[EXPECTED] [{}]", _listElems(_mismatch.second, expected.end()));
+            ++failCount;
+        }
+    } catch (std::exception const& e) {
+        // Prints the zero-based index of the test.
+        Console::printl("[FAIL] Test {}", testCount - 1);
         Console::printl("[INPUT] {}", Text::quote(input));
-        Console::printl("[ACTUAL] [{}]", _listElems(_mismatch.first, _actual.end()));
-        Console::printl("[EXPECTED] [{}]", _listElems(_mismatch.second, expected.end()));
+        Console::printl("[EXCEPTION] {} | {}", typeid(e).name(), e.what());
+        ++failCount;
+    } catch (...) {
         ++failCount;
     }
 }
