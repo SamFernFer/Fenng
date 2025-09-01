@@ -29,7 +29,7 @@ void runTests();
 // Tests the spelling of a token.
 void testSpelling(Token const& token, std::string_view expected);
 // Tests if trying to get the spelling of a token results in the expected exception.
-template<std::derived_from<Exception> ExceptionType>
+/* template<std::derived_from<Exception> ExceptionType>
 void testSpelling(Token const& token, ExceptionType const& exception) {
     ++testCount;
     try {
@@ -50,14 +50,14 @@ void testSpelling(Token const& token, ExceptionType const& exception) {
         Console::printl("[ACTUAL] Unknown exception.");
         Console::printl("[EXPECTED] {} | {}" typeid(ExceptionType).name(), exception.what());
     }
-}
+} */
 // Tests the tokenisation of a string.
 void testTokens(std::string const& input, std::deque<Token> const& expected);
 // Tests if trying to tokenise the string results in the expected exception.
-template<std::derived_from<Exception> ExceptionType>
+/* template<std::derived_from<Exception> ExceptionType>
 void testTokens(std::string const& input, ExceptionType const& exception) {
     ;
-}
+} */
 int main(int argc, char** argv) {
     try {
         init();
@@ -80,17 +80,22 @@ void term() {
     Console::term();
 }
 void runTests() {
+    Console::printl("[SECTION] Integers - Spelling");
+
     testSpelling(Number( { "123" }, {}, 10), "123");
     testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
     testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
     testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
 
-    /* testTokens("123", { Number( { "123" }, {}, 10) });
+    /* Console::printl("[SECTION] Integers - Tokenisation");
+
+    testTokens("123", { Number( { "123" }, {}, 10) });
     testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
     testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
     testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
+
     #if 0
-    // Integers:
+    
 
     // - Literals:
     testTokens("0", N( "0" ));
@@ -113,6 +118,21 @@ void runTests() {
     // - Comparison and arithmetics:
     testTokens("2 + 2 != 5", "#true");
     #endif
+
+    Console::printl("[SECTION] Decimals - Spelling");
+
+    testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
+    testSpelling(Number( { "123", "912", "0", "1000" }, {}, 10), "123.912.0.1000");
+    testSpelling(Number( { "123", "912", "0" }, { "u8" }, 10), "123.912.0u8");
+    testSpelling(Number( { "123", "0" }, { "u1" }, 10), "123.0u1");
+    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c");
+
+    /* Console::printl("[SECTION] Decimals - Tokenisation");
+
+    testTokens("123", { Number( { "123" }, {}, 10) });
+    testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
+    testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
+    testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
 }
 void testSpelling(Token const& token, std::string_view expected) {
     ++testCount;
