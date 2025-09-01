@@ -2,10 +2,15 @@
 #include <vector>
 #include <string>
 #include <variant>
+#include <stdexcept>
 #include <cstdint>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
+        class Exception : public std::runtime_error {
+        public:
+            using std::runtime_error::runtime_error;
+        };
         class Name {
         private:
             std::string spelling;

@@ -6,6 +6,7 @@
 #include <utility>
 #include <string>
 #include <sstream>
+#include <concepts>
 #include <stdexcept>
 #include <cstdint>
 
@@ -17,14 +18,34 @@ using Fennton::Skript::Tokeniser::Name;
 using Fennton::Skript::Tokeniser::Number;
 using Fennton::Skript::Tokeniser::Punct;
 using Fennton::Skript::Tokeniser::tokenise;
+using Fennton::Skript::Tokeniser::Exception;
 
 static std::int64_t testCount = 0, failCount = 0;
 
 void init();
 void term();
 void runTests();
+// Tests the spelling of a token.
 void testSpelling(Token const& token, std::string_view expected);
+// Tests if trying to get the spelling of a token results in the expected exception.
+template<std::derived_from<Exception> ExceptionType>
+void testSpelling(Token const& token, ExceptionType const& exception) {
+    ++testCount;
+    try {
+    } catch (ExceptionType const& e) {
+    } catch (...) {
+        // Zero-based index of the test.
+        Console::printl("[FAIL] Test {}", testCount - 1);
+        Console::printl("[EXPECTED]");
+    }
+}
+// Tests the tokenisation of a string.
 void testTokens(std::string const& input, std::deque<Token> const& expected);
+// Tests if trying to tokenise the string results in the expected exception.
+template<std::derived_from<Exception> ExceptionType>
+void testTokens(std::string const& input, ExceptionType const& exception) {
+    ;
+}
 int main(int argc, char** argv) {
     try {
         init();
@@ -48,6 +69,9 @@ void term() {
 }
 void runTests() {
     testSpelling(Number( { "123" }, {}, 10), "123");
+    testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
+    testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
+    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
 
     /* testTokens("123", { Number( { "123" }, {}, 10) });
     testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
