@@ -28,7 +28,7 @@ void init();
 void term();
 void runTests();
 // Tests the spelling of a token.
-void testSpelling(Token::VariantType const& token, std::string_view expected);
+void testSpelling(Token::VariantType const& innerToken, std::string_view expected);
 // Tests if trying to get the spelling of a token results in the expected exception.
 /* template<std::derived_from<Exception> ExceptionType>
 void testSpelling(Token const& token, ExceptionType const& exception) {
@@ -151,18 +151,10 @@ void runTests() {
     Console::printl("[SECTION] Decimals - Spelling");
 
     testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
-    testSpelling(
-        { Number( { "123", "912", "0", "1000" }, {}, 10), AfterMode::Eof }, "123.912.0.1000"
-    );
-    testSpelling(
-        { Number( { "123", "912", "0" }, { "u8" }, 10), AfterMode::Eof }, "123.912.0u8"
-    );
-    testSpelling(
-        { Number( { "123", "0" }, { "u1" }, 10), AfterMode::Eof }, "123.0u1"
-    );
-    testSpelling(
-        { Number( { "123", "661" }, { "a", "b", "c" }, 10), AfterMode::Eof }, "123.661a'b'c"
-    );
+    testSpelling(Number( { "123", "912", "0", "1000" }, {}, 10), "123.912.0.1000");
+    testSpelling(Number( { "123", "912", "0" }, { "u8" }, 10), "123.912.0u8");
+    testSpelling(Number( { "123", "0" }, { "u1" }, 10), "123.0u1");
+    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c");
 
     /* Console::printl("[SECTION] Decimals - Tokenisation");
 
@@ -171,15 +163,19 @@ void runTests() {
     testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
     testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
 }
-void testSpelling(Token::VariantType const& token, std::string_view expected) {
+void testSpelling(Token::VariantType const& innerToken, std::string_view expected) {
     ++testCount;
-
-    std::string _actual = token.GetSpelling();
+    /* auto _testSpelling = []() {
+    };
+    _testSpelling(false);
+    _testSpelling(true); */
+    std::string _actual = Token(innerToken, false).GetSpelling();
     if (_actual != expected) {
         // Prints the zero-based test index.
         Console::printl("[FAIL] Test {}", testCount - 1);
-        Console::printl("[ACTUAL] [{}]", _actual);
-        Console::printl("[EXPECTED] [{}]", expected);
+        // Console::printl("[INPUT] hasSpaceAfter = {}", _token.HasSpaceAfter()? "true" : "false");
+        Console::printl("[ACTUAL] {}", Text::quote(_actual));
+        Console::printl("[EXPECTED] {}", Text::quote(expected));
         ++failCount;
     }
 }
