@@ -9,7 +9,17 @@
 namespace Fennton::Skript {
     namespace Tokeniser {
         enum class NextMode {
-            Token, TokenAndEOF, Eof
+            // Token with still characters after it.
+            Token,
+            // Token right before EOF.
+            TokenAndEOF,
+            // EOF without token.
+            Eof
+        };
+        enum class AfterMode {
+            Token,
+            Space,
+            Eof
         };
         class Exception : public std::runtime_error {
         public:
@@ -44,7 +54,7 @@ namespace Fennton::Skript {
         public:
             // Constructor with explicit storage.
             Number(
-                std::string const& storage,
+                std::string&& storage,
                 std::vector<std::string_view> const& parts,
                 std::vector<std::string_view> const& suffixes,
                 std::int32_t base
@@ -57,6 +67,11 @@ namespace Fennton::Skript {
             );
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
+            // Returns a token AfterMode::
+            static std::pair<NextMode, Token> parseBase2(
+                std::string_view::const_iterator start,
+                std::string_view::const_iterator end
+            );
             // Returns the token's spelling, not exactly equal to how it was spelled in the 
             // source, but which generates the same token if retokenised.
             std::string GetSpelling() const;
@@ -92,6 +107,7 @@ namespace Fennton::Skript {
 
             Token(Token const&) = default;
             Token(Token&&) = default;
+            Token() = default;
             template<typename T> Token(T const& innerVal) {
                 var = innerVal;
             }
@@ -126,6 +142,16 @@ namespace Fennton::Skript {
         // Returns true if the character is a control character (the set include some 
         // character classified as whitespace), else returns false.
         bool isControl(char c);
+        // Consumes whitespace, single-line comments and multi-line comments.
+        std::string_view::const_iterator consumeSpace(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        );
+        // Tokenises the next token from the start iterator until before the end iterator.
+        std::pair<NextMode, Token> tokeniseNext(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        );
         // Tokenises the string into a deque and returns it. The tokens do not depend on the original string, 
         // so it is free to deallocate it.
         std::deque<Tokeniser::Token> tokenise(std::string_view str);

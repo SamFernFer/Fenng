@@ -19,7 +19,7 @@ namespace Fennton::Skript {
         }
 
         Number::Number(
-            std::string const& storage,
+            std::string&& storage,
             std::vector<std::string_view> const& parts,
             std::vector<std::string_view> const& suffixes,
             std::int32_t base
@@ -222,26 +222,41 @@ namespace Fennton::Skript {
         bool isControl(char c) {
             return std::iscntrl(c, std::locale::classic());
         }
-        std::pair<Token, NextMode> tokeniseNext(
-            std::string_view str,
-            std::string_view::const_iterator it
+        std::string_view::const_iterator consumeSpace(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
         ) {
-            if (i < str.size()) {
-                switch (str[i]) {
+            for (;;) {
+                if (
+                    start == end
+                    || !isSpace(*start)
+                ) {
+                    return start;
+                }
+                ++start;
+            }
+            return start;
+        }
+        std::pair<NextMode, Token> tokeniseNext(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        ) {
+            if (start != end) {
+                switch (*start) {
                     // Base 2, 8, 10 or 16.
                     case '0':
-                        ++i;
-                        if (i < str.size()) {
-                            switch (std[i]) {
+                        ++start;
+                        if (start != end) {
+                            switch (*start) {
                                 // Binary (`0b`).
                                 case 'b':
-                                    return parseBase2();
+                                    return Number::parseBase2(start, end);
                                 // Octal (`0o`).
                                 case 'o':
-                                    return parseBase8();
+                                    return Number::parseBase8(start, end);
                                 // Hexadecimal (`0x`).
                                 case 'x':
-                                    return parseBase16();
+                                    return Number::parseBase16(start, end);
                                 // Decimal (no prefix).
                                 case '0':
                                 case '1':
@@ -253,10 +268,14 @@ namespace Fennton::Skript {
                                 case '7':
                                 case '8':
                                 case '9':
-                                    return parseBase10();
+                                    return Number::parseBase10(start, end);
                             }
                         } else {
-                            return { NextMode::TokenAndEOF, parseBase10() };
+                            // The only possible number is zero.
+                            std::string _storage = "0";
+                            return { NextMode::TokenAndEOF, Number(
+                                std::move(_storage), { _storage }, {}, 10
+                            ) };
                         }
                     // Base 10 number.
                     case '1':
@@ -268,8 +287,10 @@ namespace Fennton::Skript {
                     case '7':
                     case '8':
                     case '9':
-                        return parseBase10();
+                        return Number::parseBase10(start);
                 }
+            } else {
+                return { NextMode::Eof, Token() };
             }
         }
         std::deque<Token> tokenise(std::string_view str) {
@@ -278,21 +299,20 @@ namespace Fennton::Skript {
             std::string_view::const_iterator _it = str.begin();
             for (;;) {
                 // Consumes whitespace and comments before trying to emit a token.
-                if (!consumeSpace(str, _it)) {
-                    // There might be a token - and if there is, it might be right before 
-                    // EOF - and there might be EOF without a token.
-                    std::pair<NextMode, Token> _maybeNextToken = tokeniseNext(str, _it);
-                    switch (_maybeNextToken.first) {
-                        case NextMode::Token:
-                            _tokens.emplace_back(std::move(_maybeNextToken.second));
-                            break;
-                        case NextMode::TokenAndEOF:
-                            _tokens.emplace_back(std::move(_maybeNextToken.second));
-                            [[fallthrough]];
-                        case NextMode::Eof:
-                            // If the EOF has been reached, then returns the deque.
-                            return std::move(_tokens);
-                    }
+                _it = consumeSpace(_it, str.end());
+                std::optional<Token> _maybeNextToken = tokeniseNext(_it, str.end());
+                // There might be a token (NextMode:: - and if there is, it might be right before 
+                // EOF - and there might be EOF without a token.
+                switch (_maybeNextToken.first) {
+                    case NextMode::Token:
+                        _tokens.emplace_back(std::move(_maybeNextToken.second));
+                        break;
+                    case NextMode::TokenAndEOF:
+                        _tokens.emplace_back(std::move(_maybeNextToken.second));
+                        [[fallthrough]];
+                    case NextMode::Eof:
+                        // If the EOF has been reached, then returns the deque.
+                        return std::move(_tokens);
                 }
             }
         }
