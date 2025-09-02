@@ -28,7 +28,7 @@ void init();
 void term();
 void runTests();
 // Tests the spelling of a token.
-void testSpelling(Token const& token, std::string_view expected);
+void testSpelling(Token::VariantType const& token, std::string_view expected);
 // Tests if trying to get the spelling of a token results in the expected exception.
 /* template<std::derived_from<Exception> ExceptionType>
 void testSpelling(Token const& token, ExceptionType const& exception) {
@@ -150,9 +150,7 @@ void runTests() {
 
     Console::printl("[SECTION] Decimals - Spelling");
 
-    testSpelling(
-        { Number( { "123", "912" }, {}, 10), AfterMode::Eof }, "123.912"
-    );
+    testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
     testSpelling(
         { Number( { "123", "912", "0", "1000" }, {}, 10), AfterMode::Eof }, "123.912.0.1000"
     );
@@ -173,7 +171,7 @@ void runTests() {
     testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
     testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
 }
-void testSpelling(Token const& token, std::string_view expected) {
+void testSpelling(Token::VariantType const& token, std::string_view expected) {
     ++testCount;
 
     std::string _actual = token.GetSpelling();

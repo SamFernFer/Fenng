@@ -231,8 +231,8 @@ namespace Fennton::Skript {
                 return arg.GetSpelling();
             }, var);
         }
-        constexpr AfterMode Token::GetAfterMode() {
-            return afterMode;
+        constexpr bool Token::HasSpaceAfter() {
+            return hasSpaceAfter;
         }
 
         bool isPunct(char c) {
@@ -298,9 +298,12 @@ namespace Fennton::Skript {
                         } else {
                             // The only possible number is zero.
                             std::string _storage = "0";
-                            return { NextMode::TokenAndEOF, Number(
-                                std::move(_storage), { _storage }, {}, 10
-                            ) };
+                            return {
+                                start, Token(
+                                    Number(std::move(_storage), { _storage }, {}, 10),
+                                    false
+                                )
+                            };
                         }
                     // Base 10 number.
                     case '1':

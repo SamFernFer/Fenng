@@ -11,21 +11,7 @@ namespace Fennton::Skript {
         class Token;
 
         using TokenResult = std::pair<std::string_view::const_iterator, Token>;
-        // using OptResult = std::pair<std::string_view::const_iterator, std::optional<Token>>;
-
-        enum class NextMode {
-            // Token with still characters after it.
-            Token,
-            // Token right before EOF.
-            TokenAndEOF,
-            // EOF without token.
-            Eof
-        };
-        enum class AfterMode {
-            Token,
-            Space,
-            Eof
-        };
+ 
         class Exception : public std::runtime_error {
         public:
             using std::runtime_error::runtime_error;
@@ -123,7 +109,7 @@ namespace Fennton::Skript {
             using VariantType = std::variant<Name, Number, String, Punct>;
         private:
             VariantType var;
-            AfterMode afterMode;
+            bool hasSpaceAfter;
 
         public:
             // static constexpr std::int32_t spaceAfterBit = 0;
@@ -131,9 +117,9 @@ namespace Fennton::Skript {
             Token(Token const&) = default;
             Token(Token&&) = default;
             Token() = default;
-            template<typename T> Token(T const& innerVal, AfterMode afterMode) {
+            template<typename T> Token(T const& innerVal, bool hasSpaceAfter) {
                 var = innerVal;
-                this->afterMode = afterMode;
+                this->hasSpaceAfter = hasSpaceAfter;
             }
             Token& operator=(Token const& other) = default;
             Token& operator=(Token&& other) = default;
@@ -150,7 +136,7 @@ namespace Fennton::Skript {
             std::string GetSpelling() const;
             // Returns true if there is a space between this token and the next and false if 
             // there is either no space or no token.
-            constexpr AfterMode GetAfterMode();
+            constexpr bool HasSpaceAfter();
         };
         // Returns true if the character is in the !"#$%&'()*+,-./:;<=>?@[\]^`{|}~ set (the set 
         // of punctuation defined by the classic C locale, minus the `_` character), else returns 
