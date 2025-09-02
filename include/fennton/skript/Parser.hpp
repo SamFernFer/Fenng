@@ -11,6 +11,11 @@ namespace Fennton::Skript {
         public:
             using std::runtime_error::runtime_error;
         };
+        class NotImplementedException : public Exception {
+        public:
+            using Exception::Exception;
+        };
+
         class Name {
         private:
             std::string spelling;

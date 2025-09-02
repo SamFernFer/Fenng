@@ -59,18 +59,30 @@ void testTokens(std::string const& input, ExceptionType const& exception) {
     ;
 } */
 int main(int argc, char** argv) {
+    int _errorCode;
     try {
         init();
+
+        // Console::printl("&_errorCode = {}", static_cast<void*>(&_errorCode));
+
+        /* for (int i = 0; i < 128; ++i) {
+            Console::printl("{} = {}", Text::quote(std::string({static_cast<char>(i)})), i);
+        } */
+
         runTests();
         // Prints the total number of failures.
         Console::printl("[TOTAL] {}/{} tests failed.", failCount, testCount);
         Console::printl("[RESULT] {}", failCount == 0? "PASS" : "FAIL");
+        _errorCode = 0;
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
+        _errorCode =  0b1;
     } catch (...) {
         Console::printl("[UNKNOWN EXCEPTION]");
+        _errorCode =  0b01;
     }
     term();
+    return _errorCode;
 }
 void init() {
     Console::init();
@@ -81,16 +93,32 @@ void term() {
 }
 void runTests() {
     Console::printl("[SECTION] Integers - Spelling");
+    // NOTE: Not testing spellings from tokens with internal states which would never 
+    // happen under normal usage.
 
+    testSpelling(Number( { "0" }, {}, 10), "0");
     testSpelling(Number( { "123" }, {}, 10), "123");
+    testSpelling(Number( { "10" }, {}, 8), "010");
+    testSpelling(Number( { "10" }, {}, 2), "0b10");
+    testSpelling(Number( { "ff" }, {}, 16), "0xff");
+
     testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
     testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
     testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
 
-    /* Console::printl("[SECTION] Integers - Tokenisation");
+    Console::printl("[SECTION] Integers - Tokenisation");
 
     testTokens("123", { Number( { "123" }, {}, 10) });
-    testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
+    testTokens("010", { Number( { "10" }, {}, 8) });
+    testTokens("0b10", { Number( { "10" }, {}, 2) });
+
+    // Hexadecimal numbers are always lowercase internally.
+    testTokens("0xff", { Number( { "ff" }, {}, 16) });
+    testTokens("0xfF", { Number( { "ff" }, {}, 16) });
+    testTokens("0xFf", { Number( { "ff" }, {}, 16) });
+    testTokens("0xFF", { Number( { "ff" }, {}, 16) });
+
+    /*testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
     testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
     testTokens("123a'b'c", { Number( { "123" }, { "a", "b", "c" }, 10) }); */
 

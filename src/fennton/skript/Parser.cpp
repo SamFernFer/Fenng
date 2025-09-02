@@ -15,7 +15,7 @@ namespace Fennton::Skript {
             return !(*this == other);
         }
         std::string Name::GetSpelling() const {
-            throw std::runtime_error("Not implemented yet.");
+            throw NotImplementedException("Not implemented yet.");
         }
 
         Number::Number(
@@ -187,7 +187,7 @@ namespace Fennton::Skript {
             return !(*this == other);
         }
         std::string String::GetSpelling() const {
-            throw std::runtime_error("Not implemented yet.");
+            throw NotImplementedException("Not implemented yet.");
         }
 
         bool Punct::operator==(Punct const& other) const {
@@ -197,7 +197,7 @@ namespace Fennton::Skript {
             return !(*this == other);
         }
         std::string Punct::GetSpelling() const {
-            throw std::runtime_error("Not implemented yet.");
+            throw NotImplementedException("Not implemented yet.");
         }
 
         std::string Token::GetSpelling() const {
@@ -223,6 +223,64 @@ namespace Fennton::Skript {
         }
         std::deque<Token> tokenise(std::string_view str) {
             std::deque<Token> _tokens;
+
+            std::size_t i = 0;
+            if (i < str.size()) {
+                switch (str[i]) {
+                    // Base 2, 8, 10 or 16.
+                    case '0':
+                        if (++i < str.size()) {
+                            emitNumber(_tokens);
+                        } else {
+                            emitNumber(_tokens, i-1);
+                        }
+                        
+                        switch (str[i]) {
+                            d
+                        }
+                        break;
+                    // Base 10 number.
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        parseBase10();
+                        break;
+                }
+            }
+
+            if (str.starts_with("0x")) {
+                // Accept [0-9], [a-f], [A-F], but make it lowercase.
+            } else if (str.starts_with("0b")) {
+                // Accept only 0 and 1.
+            } else if (str.starts_with("0")) {
+                // Accept only [0-7].
+            } else if (isDigit(*str.begin())) {
+                // Accept [0-9].
+            }
+            /* std::size_t i = 0;
+            while (true) {
+                if (i >= str.size()) {
+                    break;
+                }
+                char const c0 = str[i];
+                // Number is not base 10.
+                if (c0 == '0') {
+                    ++i;
+                    if (i >= str.size()) {
+                        _tokens
+                    }
+                    char const c1 = str[i];
+                }
+                // Number is base 10.
+                ++i;
+            } */
+
             return std::move(_tokens);
         }
     }
