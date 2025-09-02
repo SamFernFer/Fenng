@@ -1,4 +1,5 @@
 #include <fennton/skript/Parser.hpp>
+#include <fennton/utils/Text.hpp>
 #include <utility>
 #include <algorithm>
 #include <format>
@@ -76,6 +77,30 @@ namespace Fennton::Skript {
         }
         bool Number::operator!=(Number const& other) const {
             return !(*this == other);
+        }
+        TokenResult Number::parseBase2(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        ) {
+            return {};
+        }
+        TokenResult Number::parseBase8(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        ) {
+            return {};
+        }
+        TokenResult parseBase10(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        ) {
+            return {};
+        }
+        TokenResult parseBase16(
+            std::string_view::const_iterator start,
+            std::string_view::const_iterator end
+        ) {
+            return {};
         }
         std::string Number::GetSpelling() const {
             // Base size.
@@ -206,8 +231,8 @@ namespace Fennton::Skript {
                 return arg.GetSpelling();
             }, var);
         }
-        constexpr bool Token::HasSpaceAfter() {
-            return hasSpaceAfter;
+        constexpr AfterMode Token::GetAfterMode() {
+            return afterMode;
         }
 
         bool isPunct(char c) {
@@ -237,7 +262,7 @@ namespace Fennton::Skript {
             }
             return start;
         }
-        std::pair<NextMode, Token> tokeniseNext(
+        TokenResult tokeniseNext(
             std::string_view::const_iterator start,
             std::string_view::const_iterator end
         ) {
@@ -287,10 +312,14 @@ namespace Fennton::Skript {
                     case '7':
                     case '8':
                     case '9':
-                        return Number::parseBase10(start);
+                        return Number::parseBase10(start, end);
+                    default:
+                        throw Exception(std::format(
+                            "Unexpected character {}.", Text::quote({ *start })
+                        ));
                 }
             } else {
-                return { NextMode::Eof, Token() };
+                return { start, {} };
             }
         }
         std::deque<Token> tokenise(std::string_view str) {
@@ -300,19 +329,21 @@ namespace Fennton::Skript {
             for (;;) {
                 // Consumes whitespace and comments before trying to emit a token.
                 _it = consumeSpace(_it, str.end());
-                std::optional<Token> _maybeNextToken = tokeniseNext(_it, str.end());
-                // There might be a token (NextMode:: - and if there is, it might be right before 
-                // EOF - and there might be EOF without a token.
-                switch (_maybeNextToken.first) {
-                    case NextMode::Token:
-                        _tokens.emplace_back(std::move(_maybeNextToken.second));
-                        break;
-                    case NextMode::TokenAndEOF:
-                        _tokens.emplace_back(std::move(_maybeNextToken.second));
-                        [[fallthrough]];
-                    case NextMode::Eof:
-                        // If the EOF has been reached, then returns the deque.
-                        return std::move(_tokens);
+                // Checks whether EOF has been reached.
+                if (_it == str.end()) {
+                    // EOF has been reached, so returns the deque.
+                    return std::move(_tokens);
+                }
+                // Retrieves a pair containing the iterator after the next token and the 
+                // next token.
+                TokenResult _nextResult = tokeniseNext(_it, str.end());
+                // Adds the token, which must exist, because all contiguous space before 
+                // it has been consumed and there was already a check for whether EOF has 
+                // been reached.
+                _tokens.emplace_back(std::move(_nextResult.second));
+                // If EOF has been reached, returns the deque.
+                if (_nextResult.first == str.end()) {
+                    return std::move(_tokens);
                 }
             }
         }

@@ -1,13 +1,18 @@
 #include <deque>
 #include <vector>
 #include <string>
-#include <utility>
+#include <optional>
 #include <variant>
 #include <stdexcept>
 #include <cstdint>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
+        class Token;
+
+        using TokenResult = std::pair<std::string_view::const_iterator, Token>;
+        // using OptResult = std::pair<std::string_view::const_iterator, std::optional<Token>>;
+
         enum class NextMode {
             // Token with still characters after it.
             Token,
@@ -67,8 +72,26 @@ namespace Fennton::Skript {
             );
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
-            // Returns a token AfterMode::
-            static std::pair<NextMode, Token> parseBase2(
+            // Parses the largest base-2 number token in the range [start, end), throwing if 
+            // unexpected characters or character sequences are present before the number's 
+            // end. Returns a pair containing the iterator after the number's end and 
+            // the number token.
+            static TokenResult parseBase2(
+                std::string_view::const_iterator start,
+                std::string_view::const_iterator end
+            );
+            // Same as parseBase2, but for base-8.
+            static TokenResult parseBase8(
+                std::string_view::const_iterator start,
+                std::string_view::const_iterator end
+            );
+            // Same as parseBase2, but for base-10.
+            static TokenResult parseBase10(
+                std::string_view::const_iterator start,
+                std::string_view::const_iterator end
+            );
+            // Same as parseBase2, but for base-16.
+            static TokenResult parseBase16(
                 std::string_view::const_iterator start,
                 std::string_view::const_iterator end
             );
@@ -100,7 +123,7 @@ namespace Fennton::Skript {
             using VariantType = std::variant<Name, Number, String, Punct>;
         private:
             VariantType var;
-            bool hasSpaceAfter;
+            AfterMode afterMode;
 
         public:
             // static constexpr std::int32_t spaceAfterBit = 0;
@@ -108,8 +131,9 @@ namespace Fennton::Skript {
             Token(Token const&) = default;
             Token(Token&&) = default;
             Token() = default;
-            template<typename T> Token(T const& innerVal) {
+            template<typename T> Token(T const& innerVal, AfterMode afterMode) {
                 var = innerVal;
+                this->afterMode = afterMode;
             }
             Token& operator=(Token const& other) = default;
             Token& operator=(Token&& other) = default;
@@ -126,7 +150,7 @@ namespace Fennton::Skript {
             std::string GetSpelling() const;
             // Returns true if there is a space between this token and the next and false if 
             // there is either no space or no token.
-            constexpr bool HasSpaceAfter();
+            constexpr AfterMode GetAfterMode();
         };
         // Returns true if the character is in the !"#$%&'()*+,-./:;<=>?@[\]^`{|}~ set (the set 
         // of punctuation defined by the classic C locale, minus the `_` character), else returns 
@@ -148,7 +172,7 @@ namespace Fennton::Skript {
             std::string_view::const_iterator end
         );
         // Tokenises the next token from the start iterator until before the end iterator.
-        std::pair<NextMode, Token> tokeniseNext(
+        TokenResult tokeniseNext(
             std::string_view::const_iterator start,
             std::string_view::const_iterator end
         );

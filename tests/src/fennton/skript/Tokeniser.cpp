@@ -14,6 +14,7 @@
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
 
+using Fennton::Skript::Tokeniser::AfterMode;
 using Fennton::Skript::Tokeniser::Token;
 using Fennton::Skript::Tokeniser::Name;
 using Fennton::Skript::Tokeniser::Number;
@@ -96,27 +97,27 @@ void runTests() {
     // NOTE: Not testing spellings from tokens with internal states which would never 
     // happen under normal usage.
 
-    testSpelling(Number( { "0" }, {}, 10), "0");
-    testSpelling(Number( { "123" }, {}, 10), "123");
-    testSpelling(Number( { "10" }, {}, 8), "010");
-    testSpelling(Number( { "10" }, {}, 2), "0b10");
-    testSpelling(Number( { "ff" }, {}, 16), "0xff");
+    testSpelling({ Number( { "0" }, {}, 10), AfterMode::Eof }, "0");
+    testSpelling({ Number( { "123" }, {}, 10), AfterMode::Eof }, "123");
+    testSpelling({ Number( { "10" }, {}, 8), AfterMode::Eof }, "010");
+    testSpelling({ Number( { "10" }, {}, 2), AfterMode::Eof }, "0b10");
+    testSpelling({ Number( { "ff" }, {}, 16), AfterMode::Eof }, "0xff");
 
-    testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
-    testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
-    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
+    testSpelling({ Number( { "123" }, { "u8" }, 10), AfterMode::Eof }, "123u8");
+    testSpelling({ Number( { "123" }, { "u1" }, 10), AfterMode::Eof }, "123u1");
+    testSpelling({ Number( { "123" }, { "a", "b", "c" }, 10), AfterMode::Eof }, "123a'b'c");
 
     Console::printl("[SECTION] Integers - Tokenisation");
 
-    testTokens("123", { Number( { "123" }, {}, 10) });
-    testTokens("010", { Number( { "10" }, {}, 8) });
-    testTokens("0b10", { Number( { "10" }, {}, 2) });
+    testTokens("123", { { Number( { "123" }, {}, 10), AfterMode::Eof } });
+    testTokens("010", { { Number( { "10" }, {}, 8), AfterMode::Eof } });
+    testTokens("0b10", { { Number( { "10" }, {}, 2), AfterMode::Eof } });
 
     // Hexadecimal numbers are always lowercase internally.
-    testTokens("0xff", { Number( { "ff" }, {}, 16) });
-    testTokens("0xfF", { Number( { "ff" }, {}, 16) });
-    testTokens("0xFf", { Number( { "ff" }, {}, 16) });
-    testTokens("0xFF", { Number( { "ff" }, {}, 16) });
+    testTokens("0xff", { { Number( { "ff" }, {}, 16), AfterMode::Eof } });
+    testTokens("0xfF", { { Number( { "ff" }, {}, 16), AfterMode::Eof } });
+    testTokens("0xFf", { { Number( { "ff" }, {}, 16), AfterMode::Eof } });
+    testTokens("0xFF", { { Number( { "ff" }, {}, 16), AfterMode::Eof } });
 
     /*testTokens("123u8", { Number( { "123" }, { "u8" }, 10) });
     testTokens("123u1", { Number( { "123" }, { "u1" }, 10) });
@@ -149,11 +150,21 @@ void runTests() {
 
     Console::printl("[SECTION] Decimals - Spelling");
 
-    testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
-    testSpelling(Number( { "123", "912", "0", "1000" }, {}, 10), "123.912.0.1000");
-    testSpelling(Number( { "123", "912", "0" }, { "u8" }, 10), "123.912.0u8");
-    testSpelling(Number( { "123", "0" }, { "u1" }, 10), "123.0u1");
-    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c");
+    testSpelling(
+        { Number( { "123", "912" }, {}, 10), AfterMode::Eof }, "123.912"
+    );
+    testSpelling(
+        { Number( { "123", "912", "0", "1000" }, {}, 10), AfterMode::Eof }, "123.912.0.1000"
+    );
+    testSpelling(
+        { Number( { "123", "912", "0" }, { "u8" }, 10), AfterMode::Eof }, "123.912.0u8"
+    );
+    testSpelling(
+        { Number( { "123", "0" }, { "u1" }, 10), AfterMode::Eof }, "123.0u1"
+    );
+    testSpelling(
+        { Number( { "123", "661" }, { "a", "b", "c" }, 10), AfterMode::Eof }, "123.661a'b'c"
+    );
 
     /* Console::printl("[SECTION] Decimals - Tokenisation");
 
