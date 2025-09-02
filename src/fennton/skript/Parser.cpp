@@ -147,12 +147,13 @@ namespace Fennton::Skript {
                     _spellingIt = std::copy(_partsIt->begin(), _partsIt->end(), _spellingIt);
                 }
             }
-            if (base == 16) {
-                *(_spellingIt++) = '.';
-                *(_spellingIt++) = '\'';
-            }
             // Writes the number's suffixes.
             if (suffixes.size() > 0) {
+                // Base-16 includes letters, so an unambiguous separator is necessary.
+                if (base == 16) {
+                    *(_spellingIt++) = '.';
+                    *(_spellingIt++) = '\'';
+                }
                 // Iterator to the beginning of the suffixes vector.
                 auto _suffixesIt = suffixes.begin();
                 // Copies the first suffix to the spelling string and updates the 
@@ -221,24 +222,42 @@ namespace Fennton::Skript {
         bool isControl(char c) {
             return std::iscntrl(c, std::locale::classic());
         }
-        std::deque<Token> tokenise(std::string_view str) {
-            std::deque<Token> _tokens;
-
-            std::size_t i = 0;
+        std::pair<Token, NextMode> tokeniseNext(
+            std::string_view str,
+            std::string_view::const_iterator it
+        ) {
             if (i < str.size()) {
                 switch (str[i]) {
                     // Base 2, 8, 10 or 16.
                     case '0':
-                        if (++i < str.size()) {
-                            emitNumber(_tokens);
+                        ++i;
+                        if (i < str.size()) {
+                            switch (std[i]) {
+                                // Binary (`0b`).
+                                case 'b':
+                                    return parseBase2();
+                                // Octal (`0o`).
+                                case 'o':
+                                    return parseBase8();
+                                // Hexadecimal (`0x`).
+                                case 'x':
+                                    return parseBase16();
+                                // Decimal (no prefix).
+                                case '0':
+                                case '1':
+                                case '2':
+                                case '3':
+                                case '4':
+                                case '5':
+                                case '6':
+                                case '7':
+                                case '8':
+                                case '9':
+                                    return parseBase10();
+                            }
                         } else {
-                            emitNumber(_tokens, i-1);
+                            return { NextMode::TokenAndEOF, parseBase10() };
                         }
-                        
-                        switch (str[i]) {
-                            d
-                        }
-                        break;
                     // Base 10 number.
                     case '1':
                     case '2':
@@ -249,39 +268,33 @@ namespace Fennton::Skript {
                     case '7':
                     case '8':
                     case '9':
-                        parseBase10();
-                        break;
+                        return parseBase10();
                 }
             }
+        }
+        std::deque<Token> tokenise(std::string_view str) {
+            std::deque<Token> _tokens;
 
-            if (str.starts_with("0x")) {
-                // Accept [0-9], [a-f], [A-F], but make it lowercase.
-            } else if (str.starts_with("0b")) {
-                // Accept only 0 and 1.
-            } else if (str.starts_with("0")) {
-                // Accept only [0-7].
-            } else if (isDigit(*str.begin())) {
-                // Accept [0-9].
-            }
-            /* std::size_t i = 0;
-            while (true) {
-                if (i >= str.size()) {
-                    break;
-                }
-                char const c0 = str[i];
-                // Number is not base 10.
-                if (c0 == '0') {
-                    ++i;
-                    if (i >= str.size()) {
-                        _tokens
+            std::string_view::const_iterator _it = str.begin();
+            for (;;) {
+                // Consumes whitespace and comments before trying to emit a token.
+                if (!consumeSpace(str, _it)) {
+                    // There might be a token - and if there is, it might be right before 
+                    // EOF - and there might be EOF without a token.
+                    std::pair<NextMode, Token> _maybeNextToken = tokeniseNext(str, _it);
+                    switch (_maybeNextToken.first) {
+                        case NextMode::Token:
+                            _tokens.emplace_back(std::move(_maybeNextToken.second));
+                            break;
+                        case NextMode::TokenAndEOF:
+                            _tokens.emplace_back(std::move(_maybeNextToken.second));
+                            [[fallthrough]];
+                        case NextMode::Eof:
+                            // If the EOF has been reached, then returns the deque.
+                            return std::move(_tokens);
                     }
-                    char const c1 = str[i];
                 }
-                // Number is base 10.
-                ++i;
-            } */
-
-            return std::move(_tokens);
+            }
         }
     }
 }

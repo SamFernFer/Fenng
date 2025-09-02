@@ -1,12 +1,16 @@
 #include <deque>
 #include <vector>
 #include <string>
+#include <utility>
 #include <variant>
 #include <stdexcept>
 #include <cstdint>
 
 namespace Fennton::Skript {
     namespace Tokeniser {
+        enum class NextMode {
+            Token, TokenAndEOF, Eof
+        };
         class Exception : public std::runtime_error {
         public:
             using std::runtime_error::runtime_error;
