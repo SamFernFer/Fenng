@@ -3,6 +3,7 @@
 #include <string>
 #include <optional>
 #include <variant>
+#include <memory>
 #include <stdexcept>
 #include <cstdint>
 
@@ -42,7 +43,7 @@ namespace Fennton::Skript {
         class Number {
         private:
             // Contiguous string containing the number's parts and suffixes.
-            std::string storage;
+            std::unique_ptr<std::string> storage;
             // Vector instead of list because it allows random indexing and it is going 
             // to handle the memory allocations and deallocations.
             std::vector<std::string_view> parts;
@@ -57,7 +58,7 @@ namespace Fennton::Skript {
             Number(Number&& other);
             // Constructor with explicit storage.
             Number(
-                std::string&& storage,
+                std::unique_ptr<std::string>&& storage,
                 std::vector<std::string_view>&& parts,
                 std::vector<std::string_view>&& suffixes,
                 std::int32_t base
@@ -130,13 +131,10 @@ namespace Fennton::Skript {
         public:
             // static constexpr std::int32_t spaceAfterBit = 0;
 
+            Token() = default;
             Token(Token const&) = delete;
             Token(Token&&);
-            Token() = default;
-            template<typename T> Token(T&& innerVal, bool hasSpaceAfter) {
-                var = std::move(innerVal);
-                this->hasSpaceAfter = hasSpaceAfter;
-            }
+            Token(VariantType&& innerVal, bool hasSpaceAfter);
             Token& operator=(Token const& other) = delete;
             Token& operator=(Token&& other);
             // Compares two tokens for equality.

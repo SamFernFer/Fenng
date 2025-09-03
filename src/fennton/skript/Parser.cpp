@@ -28,14 +28,14 @@ namespace Fennton::Skript {
             moveFrom(std::move(other));
         }
         Number::Number(
-            std::string&& storage,
+            std::unique_ptr<std::string>&& storage,
             std::vector<std::string_view>&& parts,
             std::vector<std::string_view>&& suffixes,
             std::int32_t base
         ) {
-            this->storage = storage;
-            this->parts = parts;
-            this->suffixes = suffixes;
+            this->storage = std::move(storage);
+            this->parts = std::move(parts);
+            this->suffixes = std::move(suffixes);
             this->base = base;
         }
         Number::Number(
@@ -50,13 +50,13 @@ namespace Fennton::Skript {
                 for (std::string_view s : suffixes) { _totalSize += s.size(); }
                 // Reconstructs the storage string with the correct size, so that there is no 
                 // need for multiple allocations.
-                this->storage = std::string(_totalSize, '#');
+                this->storage = std::make_unique<std::string>(_totalSize, '#');
             }
             this->parts = std::vector<std::string_view>(parts.size());
             this->suffixes = std::vector<std::string_view>(suffixes.size());
             this->base = base;
 
-            std::string::iterator _it = this->storage.begin();
+            std::string::iterator _it = this->storage->begin();
             for (std::size_t i = 0; i < parts.size(); ++i) {
                 std::string_view _s = parts[i];
 
@@ -116,7 +116,7 @@ namespace Fennton::Skript {
         }
         std::string Number::GetSpelling() const {
             // Base size.
-            std::size_t _size = storage.size();
+            std::size_t _size = storage->size();
             // If there is more than one part, then reserves space for the radixes.
             if (parts.size() > 1) { _size += parts.size() - 1; }
             // If there is more than one suffix, then reserves space for the 
@@ -244,6 +244,10 @@ namespace Fennton::Skript {
         }
         Token::Token(Token&& other) {
             moveFrom(std::move(other));
+        }
+        Token::Token(VariantType&& innerVal, bool hasSpaceAfter) {
+            var = std::move(innerVal);
+            this->hasSpaceAfter = hasSpaceAfter;
         }
         Token& Token::operator=(Token&& other) {
             moveFrom(std::move(other));
@@ -401,10 +405,10 @@ namespace Fennton::Skript {
                             }
                         } else {
                             // The only possible number is zero.
-                            std::string _storage = "0";
+                            auto _storage = std::make_unique<std::string>("0");
                             return {
                                 start, Token(
-                                    Number(std::move(_storage), { _storage }, {}, 10),
+                                    Number(std::move(_storage), { *_storage }, {}, 10),
                                     false
                                 )
                             };

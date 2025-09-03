@@ -112,14 +112,14 @@ void runTests() {
     Console::printl("[SECTION] Integers - Spelling");
 
     testSpelling(Number( { "0" }, {}, 10), "0");
-    /* testSpelling(Number( { "123" }, {}, 10), "123");
+    testSpelling(Number( { "123" }, {}, 10), "123");
     testSpelling(Number( { "10" }, {}, 8), "010");
     testSpelling(Number( { "10" }, {}, 2), "0b10");
     testSpelling(Number( { "ff" }, {}, 16), "0xff");
 
     testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
     testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
-    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c"); */
+    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
 
     /* Console::printl("[SECTION] Integers - Tokenisation");
 
@@ -211,7 +211,7 @@ static bool checkSpelling(
 }
 void testSpelling(Token::VariantType&& innerToken, std::string_view expected) {
     ++testCount;
-    Token _token = Token(innerToken, false);
+    Token _token = Token(std::move(innerToken), false);
     if (
         // Without a space after.
         !checkSpelling(expected, _token, false)
