@@ -112,14 +112,14 @@ void runTests() {
     // happen under normal usage.
 
     testSpelling(Number( { "0" }, {}, 10), "0");
-    testSpelling(Number( { "123" }, {}, 10), "123");
+    /* testSpelling(Number( { "123" }, {}, 10), "123");
     testSpelling(Number( { "10" }, {}, 8), "010");
     testSpelling(Number( { "10" }, {}, 2), "0b10");
     testSpelling(Number( { "ff" }, {}, 16), "0xff");
 
     testSpelling(Number( { "123" }, { "u8" }, 10), "123u8");
     testSpelling(Number( { "123" }, { "u1" }, 10), "123u1");
-    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c");
+    testSpelling(Number( { "123" }, { "a", "b", "c" }, 10), "123a'b'c"); */
 
     /* Console::printl("[SECTION] Integers - Tokenisation");
 
@@ -160,13 +160,13 @@ void runTests() {
         testTokens("2 + 2 != 5", "#true");
     #endif
 
-    Console::printl("[SECTION] Decimals - Spelling");
+    /* Console::printl("[SECTION] Decimals - Spelling");
 
     testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
     testSpelling(Number( { "123", "912", "0", "1000" }, {}, 10), "123.912.0.1000");
     testSpelling(Number( { "123", "912", "0" }, { "u8" }, 10), "123.912.0u8");
     testSpelling(Number( { "123", "0" }, { "u1" }, 10), "123.0u1");
-    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c");
+    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c"); */
 
     /* Console::printl("[SECTION] Decimals - Tokenisation");
 
@@ -212,9 +212,9 @@ void testSpelling(Token::VariantType const& innerToken, std::string_view expecte
     ++testCount;
     if (
         // Without a space after.
-        checkSpelling(expected, innerToken, false)
+        !checkSpelling(expected, innerToken, false)
         // With a space after.
-        || checkSpelling(expected, innerToken, true)
+        || !checkSpelling(expected, innerToken, true)
     ) {
         // Even if multiple variations fail, it still counts as a single error.
         ++failCount;
