@@ -11,6 +11,14 @@ namespace Fennton::Skript {
         class Token;
 
         using TokenResult = std::pair<std::string_view::const_iterator, Token>;
+
+        // Returned by the isDigit16 function, to make tokenisation error messages more 
+        // helpful by explaining that uppercase letters are disallowed.
+        enum class HexError {
+            True, // It is a hexadecimal digit.
+            False, // It is NOT a hexadecimal digit.
+            Uppercase // It is an uppercase hexadecimal digit, so it is invalid.
+        };
  
         class Exception : public std::runtime_error {
         public:
@@ -142,9 +150,18 @@ namespace Fennton::Skript {
         // of punctuation defined by the classic C locale, minus the `_` character), else returns 
         // false.
         bool isPunct(char c);
-        // Returns true if the character is a decimal digit (in the 0123456789 set), else returns 
+        // Returns true if the character is a binary digit (0 or 1), else returns false.
+        bool isDigit2(char c);
+        // Returns true if the character is an octal digit (in the 01234567 set), else returns 
         // false.
-        bool isDigit(char c);
+        bool isDigit8(char c);
+        // Returns true if the character is a decimal digit (in the 0123456789 set), else 
+        // returns false.
+        bool isDigit10(char c);
+        // Returns HexError::True if the character is a lowercase hexadecimal digit (in the
+        // 0123456789abcdef set), HexError::Uppercase if the character is an uppercase 
+        // hexadecimal digit (in the ABCDEF set) and false otherwise.
+        HexError isDigit16(char c);
         // Returns true if the character is whitespace, in the set: 0x20 (' ', space), 
         // 0x0c ('\f', form feed), 0x0a ('\n', line feed), 0x0d ('\r', carriage return), 
         // 0x09 ('\t', horizontal tab), 0x0b ('\v', vertical tab). Else, returns false.

@@ -90,13 +90,13 @@ namespace Fennton::Skript {
         ) {
             return {};
         }
-        TokenResult parseBase10(
+        TokenResult Number::parseBase10(
             std::string_view::const_iterator start,
             std::string_view::const_iterator end
         ) {
             return {};
         }
-        TokenResult parseBase16(
+        TokenResult Number::parseBase16(
             std::string_view::const_iterator start,
             std::string_view::const_iterator end
         ) {
@@ -227,9 +227,13 @@ namespace Fennton::Skript {
         }
 
         std::string Token::GetSpelling() const {
-            return std::visit([](auto&& arg){
+            std::string _spelling = std::visit([](auto&& arg){
                 return arg.GetSpelling();
             }, var);
+            if (hasSpaceAfter) {
+                _spelling.append({' '});
+            }
+            return std::move(_spelling);
         }
         constexpr bool Token::HasSpaceAfter() {
             return hasSpaceAfter;
@@ -238,8 +242,76 @@ namespace Fennton::Skript {
         bool isPunct(char c) {
             return c != '_' && std::ispunct(c, std::locale::classic());
         }
-        bool isDigit(char c) {
-            return std::isdigit(c, std::locale::classic());
+        bool isDigit2(char c) {
+            switch (c) {
+                case '0':
+                case '1':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        bool isDigit8(char c) {
+            switch (c) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        bool isDigit10(char c) {
+            switch (c) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        HexError isDigit16(char c) {
+            switch (c) {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                    return HexError::True;
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                    return HexError::Uppercase;
+                default:
+                    return HexError::False;
+            }
         }
         bool isSpace(char c) {
             return std::isspace(c, std::locale::classic());
