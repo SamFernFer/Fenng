@@ -55,6 +55,7 @@ namespace Fennton::Skript {
             void moveFrom(Number&& other);
         public:
             Number(Number const&) = delete;
+            // Move constructor. The other object is left in an invalid state.
             Number(Number&& other);
             // Constructor with explicit storage.
             Number(
@@ -70,6 +71,7 @@ namespace Fennton::Skript {
                 std::int32_t base
             );
             Number& operator=(Number const&) = delete;
+            // Move assignment operator. The other object is left in an invalid state.
             Number& operator=(Number&& other);
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
