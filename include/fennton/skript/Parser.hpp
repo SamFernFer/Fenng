@@ -50,12 +50,16 @@ namespace Fennton::Skript {
             std::vector<std::string_view> suffixes;
             // The number's base.
             std::int32_t base;
+            // Moves the fields from the other object into this.
+            void moveFrom(Number&& other);
         public:
+            Number(Number const&) = delete;
+            Number(Number&& other);
             // Constructor with explicit storage.
             Number(
                 std::string&& storage,
-                std::vector<std::string_view> const& parts,
-                std::vector<std::string_view> const& suffixes,
+                std::vector<std::string_view>&& parts,
+                std::vector<std::string_view>&& suffixes,
                 std::int32_t base
             );
             // Construtor with the storage string built automatically.
@@ -64,6 +68,8 @@ namespace Fennton::Skript {
                 std::vector<std::string_view> const& suffixes,
                 std::int32_t base
             );
+            Number& operator=(Number const&) = delete;
+            Number& operator=(Number&& other);
             bool operator==(Number const& other) const;
             bool operator!=(Number const& other) const;
             // Parses the largest base-2 number token in the range [start, end), throwing if 
@@ -119,32 +125,32 @@ namespace Fennton::Skript {
             VariantType var;
             bool hasSpaceAfter;
 
+            // Moves the fields from another Token object into this.
+            void moveFrom(Token&&);
         public:
             // static constexpr std::int32_t spaceAfterBit = 0;
 
-            Token(Token const&) = default;
-            Token(Token&&) = default;
+            Token(Token const&) = delete;
+            Token(Token&&);
             Token() = default;
-            template<typename T> Token(T const& innerVal, bool hasSpaceAfter) {
-                var = innerVal;
+            template<typename T> Token(T&& innerVal, bool hasSpaceAfter) {
+                var = std::move(innerVal);
                 this->hasSpaceAfter = hasSpaceAfter;
             }
-            Token& operator=(Token const& other) = default;
-            Token& operator=(Token&& other) = default;
+            Token& operator=(Token const& other) = delete;
+            Token& operator=(Token&& other);
             // Compares two tokens for equality.
-            bool operator==(Token const& other) const {
-                return var == other.var;
-            }
+            bool operator==(Token const& other) const;
             // Compares two tokens for inequality.
-            bool operator!=(Token const& other) const {
-                return !(*this == other);
-            }
+            bool operator!=(Token const& other) const;
             // Returns the token's spelling, not exactly equal to how it was spelled in the 
             // source, but which generates the same token if retokenised.
             std::string GetSpelling() const;
             // Returns true if there is a space between this token and the next and false if 
             // there is either no space or no token.
-            constexpr bool HasSpaceAfter();
+            bool HasSpaceAfter() const;
+            // Sets the value of the hasSpaceAfter field.
+            void HasSpaceAfter(bool hasSpaceAfter);
         };
         // Returns true if the character is in the !"#$%&'()*+,-./:;<=>?@[\]^`{|}~ set (the set 
         // of punctuation defined by the classic C locale, minus the `_` character), else returns 

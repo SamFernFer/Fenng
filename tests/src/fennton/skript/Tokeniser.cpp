@@ -34,7 +34,7 @@ Token number(
 );
 void runTests();
 // Tests the spelling of a token.
-void testSpelling(Token::VariantType const& innerToken, std::string_view expected);
+void testSpelling(Token::VariantType&& innerToken, std::string_view expected);
 // Tests if trying to get the spelling of a token results in the expected exception.
 /* template<std::derived_from<Exception> ExceptionType>
 void testSpelling(Token const& token, ExceptionType const& exception) {
@@ -107,9 +107,9 @@ Token number(
     return Token(Number(parts, suffixes, base), hasSpaceAfter);
 }
 void runTests() {
-    Console::printl("[SECTION] Integers - Spelling");
     // NOTE: Not testing spellings from tokens with internal states which would never 
     // happen under normal usage.
+    Console::printl("[SECTION] Integers - Spelling");
 
     testSpelling(Number( { "0" }, {}, 10), "0");
     /* testSpelling(Number( { "123" }, {}, 10), "123");
@@ -178,7 +178,7 @@ void runTests() {
 // Tests spelling for the specific variation of the token.
 static bool checkSpelling(
     std::string_view expected,
-    Token::VariantType const& innerToken,
+    Token& token,
     bool hasSpaceAfter
 ) {
     // The size for the final expected string.
@@ -196,8 +196,9 @@ static bool checkSpelling(
     if (hasSpaceAfter) {
         *_expected.rbegin() = ' ';
     }
+    token.HasSpaceAfter(hasSpaceAfter);
     // Constructs the token variation temporarily and gets its spelling.
-    std::string _actual = Token(innerToken, hasSpaceAfter).GetSpelling();
+    std::string _actual = token.GetSpelling();
     if (_actual != _expected) {
         // Prints the zero-based test index.
         Console::printl("[FAIL] Test {}", testCount - 1);
@@ -208,13 +209,14 @@ static bool checkSpelling(
     }
     return true;
 }
-void testSpelling(Token::VariantType const& innerToken, std::string_view expected) {
+void testSpelling(Token::VariantType&& innerToken, std::string_view expected) {
     ++testCount;
+    Token _token = Token(innerToken, false);
     if (
         // Without a space after.
-        !checkSpelling(expected, innerToken, false)
+        !checkSpelling(expected, _token, false)
         // With a space after.
-        || !checkSpelling(expected, innerToken, true)
+        || !checkSpelling(expected, _token, true)
     ) {
         // Even if multiple variations fail, it still counts as a single error.
         ++failCount;

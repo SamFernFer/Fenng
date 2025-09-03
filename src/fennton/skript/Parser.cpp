@@ -18,11 +18,19 @@ namespace Fennton::Skript {
         std::string Name::GetSpelling() const {
             throw NotImplementedException("Not implemented yet.");
         }
-
+        void Number::moveFrom(Number&& other) {
+            this->storage = std::move(other.storage);
+            this->parts = std::move(other.parts);
+            this->suffixes = std::move(other.suffixes);
+            this->base = std::move(other.base);
+        }
+        Number::Number(Number&& other) {
+            moveFrom(std::move(other));
+        }
         Number::Number(
             std::string&& storage,
-            std::vector<std::string_view> const& parts,
-            std::vector<std::string_view> const& suffixes,
+            std::vector<std::string_view>&& parts,
+            std::vector<std::string_view>&& suffixes,
             std::int32_t base
         ) {
             this->storage = storage;
@@ -67,6 +75,10 @@ namespace Fennton::Skript {
                 // Uses the previous iterator and the current one to constuct the string_view.
                 this->suffixes[i] = std::string_view(_oldIt, _it);
             }
+        }
+        Number& Number::operator=(Number&& other) {
+            moveFrom(std::move(other));
+            return *this;
         }
         bool Number::operator==(Number const& other) const {
             return
@@ -226,6 +238,23 @@ namespace Fennton::Skript {
             throw NotImplementedException("Not implemented yet.");
         }
 
+        void Token::moveFrom(Token&& other) {
+            this->var = std::move(other.var);
+            this->hasSpaceAfter = other.hasSpaceAfter;
+        }
+        Token::Token(Token&& other) {
+            moveFrom(std::move(other));
+        }
+        Token& Token::operator=(Token&& other) {
+            moveFrom(std::move(other));
+            return *this;
+        }
+        bool Token::operator==(Token const& other) const {
+            return this->var == other.var && this->hasSpaceAfter == other.hasSpaceAfter;
+        }
+        bool Token::operator!=(Token const& other) const {
+            return !(operator==(other));
+        }
         std::string Token::GetSpelling() const {
             std::string _spelling = std::visit([](auto&& arg){
                 return arg.GetSpelling();
@@ -235,8 +264,11 @@ namespace Fennton::Skript {
             }
             return std::move(_spelling);
         }
-        constexpr bool Token::HasSpaceAfter() {
+        bool Token::HasSpaceAfter() const {
             return hasSpaceAfter;
+        }
+        void Token::HasSpaceAfter(bool hasSpaceAfter) {
+            this->hasSpaceAfter = hasSpaceAfter;
         }
 
         bool isPunct(char c) {
@@ -394,7 +426,7 @@ namespace Fennton::Skript {
                         ));
                 }
             } else {
-                return { start, {} };
+                return { start, Token() };
             }
         }
         std::deque<Token> tokenise(std::string_view str) {
