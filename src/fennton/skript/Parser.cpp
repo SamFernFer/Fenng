@@ -136,10 +136,13 @@ namespace Fennton::Skript {
                     // No prefix.
                     break;
                 case 16:
-                    // Space for the base prefix ("0x") and for the radix followed by a 
-                    // suffix/number separator (".'"), necessary before the suffix list, 
-                    // as a base-16 number includes letters.
-                    _size += 4;
+                    // Space for the base prefix ("0x").
+                    _size += 2;
+                    // Space for the radix followed by a suffix/number separator (".'"), 
+                    // necessary before the suffix list, as a base-16 number includes letters.
+                    if (!suffixes.empty()) {
+                        _size += 2;
+                    }
                     break;
                 default:
                     throw std::runtime_error(std::format(
@@ -168,7 +171,7 @@ namespace Fennton::Skript {
                 // No need for a default case, as unsupported bases have already been handled.
             }
             // Writes the number's parts.
-            if (parts.size() > 0) {
+            if (!parts.empty()) {
                 // Iterator to the beginning of the parts vector.
                 auto _partsIt = parts.begin();
                 // Copies the first part to the spelling string and updates the spelling 
@@ -185,7 +188,7 @@ namespace Fennton::Skript {
                 }
             }
             // Writes the number's suffixes.
-            if (suffixes.size() > 0) {
+            if (!suffixes.empty()) {
                 // Base-16 includes letters, so an unambiguous separator is necessary.
                 if (base == 16) {
                     *(_spellingIt++) = '.';

@@ -107,7 +107,7 @@ Token number(
     return Token(Number(parts, suffixes, base), hasSpaceAfter);
 }
 void runTests() {
-    // NOTE: Not testing spellings from tokens with internal states which would never 
+    // NOTE: Not testing spellings from tokens with internal states which should never 
     // happen under normal usage.
     Console::printl("[SECTION] Integers - Spelling");
 
@@ -160,13 +160,13 @@ void runTests() {
         testTokens("2 + 2 != 5", "#true");
     #endif
 
-    /* Console::printl("[SECTION] Decimals - Spelling");
+    Console::printl("[SECTION] Multipart - Spelling");
 
     testSpelling(Number( { "123", "912" }, {}, 10), "123.912");
     testSpelling(Number( { "123", "912", "0", "1000" }, {}, 10), "123.912.0.1000");
     testSpelling(Number( { "123", "912", "0" }, { "u8" }, 10), "123.912.0u8");
     testSpelling(Number( { "123", "0" }, { "u1" }, 10), "123.0u1");
-    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c"); */
+    testSpelling(Number( { "123", "661" }, { "a", "b", "c" }, 10), "123.661a'b'c");
 
     /* Console::printl("[SECTION] Decimals - Tokenisation");
 
@@ -215,8 +215,9 @@ void testSpelling(Token::VariantType&& innerToken, std::string_view expected) {
     if (
         // Without a space after.
         !checkSpelling(expected, _token, false)
-        // With a space after.
-        || !checkSpelling(expected, _token, true)
+        // With a space after. Not using the `||` operator, because it is best to execute 
+        // all variations, even after some of them fail.
+        | !checkSpelling(expected, _token, true)
     ) {
         // Even if multiple variations fail, it still counts as a single error.
         ++failCount;
