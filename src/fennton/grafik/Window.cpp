@@ -1,6 +1,6 @@
 #include <fennton/utils/Console.hpp>
 
-#include <fennton/gl/Window.hpp>
+#include <fennton/grafik/Window.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>

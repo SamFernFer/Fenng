@@ -1,4 +1,4 @@
-#include <fennton/gl/Window.hpp>
+#include <fennton/grafik/Window.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
 #include <glad/glad.h>
