@@ -10,4 +10,9 @@ namespace Fennton::Grafik {
     public:
         using Exception::Exception;
     };
+
+    class LinkingException : public Exception {
+    public:
+        using Exception::Exception;
+    };
 }
