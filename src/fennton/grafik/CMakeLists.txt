@@ -1,4 +1,4 @@
-set(ProgramName fennton_gl)
+set(ProgramName fennton_grafik)
 
 add_library(${ProgramName} STATIC
 	"${PROJECT_SOURCE_DIR}/depends/glad/src/glad.c"

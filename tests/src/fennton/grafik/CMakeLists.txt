@@ -1,7 +1,7 @@
 set(ProgramName window_manip)
 
 add_executable(${ProgramName} "Manipulation.cpp")
-target_link_libraries(${ProgramName} fennton_utils fennton_gl)
+target_link_libraries(${ProgramName} fennton_utils fennton_grafik)
 target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
 target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
 
