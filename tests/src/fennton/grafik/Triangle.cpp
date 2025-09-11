@@ -20,7 +20,7 @@ using Grafik::Monitor;
 using Grafik::CompilationException;
 using Grafik::LinkingException;
 
-std::uint32_t vbo;
+std::uint32_t triVBO, triVAO;
 std::uint32_t vertShader, fragShader, triProg;
 
 Strong<Window> mainWindow = nullptr;
@@ -29,13 +29,18 @@ void init();
 void term();
 void loop();
 
-std::uint32_t createMesh(std::uint64_t size, float* vertices);
+void createMesh(
+    std::uint64_t size, float* vertices,
+    std::uint32_t* vbo, std::uint32_t* vao
+);
+void drawMesh(std::uint32_t vao);
 std::uint32_t createShader(std::uint32_t type, char const* src);
 void deleteShader(std::uint32_t shader);
 std::uint32_t createProgram();
 void deleteProgram(std::uint32_t program);
 void attachShader(std::uint32_t program, std::uint32_t shader);
 void linkProgram(std::uint32_t program);
+void useProgram(std::uint32_t program);
 
 int main() {
     try {
@@ -67,7 +72,7 @@ void init() {
          0.0f,  0.5f, 0.0f
     };
 
-    vbo = createMesh(sizeof(_verts), _verts);
+    createMesh(sizeof(_verts), _verts, &triVBO, &triVAO);
 
     char const* _vertSrc = R"(
         #version 330 core
@@ -112,16 +117,31 @@ void loop() {
             glClearColor(0.1f, 0.3f, 0.15f, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
         }
+
+        useProgram(triProg);
+        drawMesh(triVAO);
+
         mainWindow->SwapBuffers();
     }
 }
 
-std::uint32_t createMesh(std::uint64_t size, float* vertices) {
-    std::uint32_t _vbo;
-    glGenBuffers(1, &_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+void createMesh(
+    std::uint64_t size, float* vertices,
+    std::uint32_t* vbo, std::uint32_t* vao
+) {
+    glGenVertexArrays(1, vao);
+    glBindVertexArray(*vao);
+
+    glGenBuffers(1, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
     glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-    return _vbo;
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+}
+void drawMesh(std::uint32_t vao) {
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 std::uint32_t createShader(std::uint32_t type, char const* src) {
     switch (type) {
@@ -196,4 +216,7 @@ void linkProgram(std::uint32_t program) {
         // Throws if linking failed.
         throw LinkingException(_msg);
     }
+}
+void useProgram(std::uint32_t program) {
+    glUseProgram(program);
 }
