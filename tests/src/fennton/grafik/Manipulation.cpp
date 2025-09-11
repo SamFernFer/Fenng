@@ -18,11 +18,11 @@
 
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
-namespace Gl = Fennton::Gl;
+namespace Grafik = Fennton::Grafik;
 
 using namespace Fennton::Memory;
-using Fennton::Gl::Window;
-using Fennton::Gl::Monitor;
+using Fennton::Grafik::Window;
+using Fennton::Grafik::Monitor;
 using Ms = std::chrono::milliseconds;
 
 typedef void(*TestStep)();
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         // It is necessary to have a current context before initialising the graphics.
         mainWindow->MakeContextCurrent();
         // Initialises OpenGL.
-        Gl::init();
+        Grafik::init();
 
         std::thread _t1 = std::thread(runTests);
         _t1.detach();

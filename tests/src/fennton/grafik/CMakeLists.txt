@@ -16,3 +16,22 @@ else()
 		-Werror=microsoft-template
 	)
 endif()
+
+set(ProgramName grafik_tri)
+
+add_executable(${ProgramName} "Triangle.cpp")
+target_link_libraries(${ProgramName} fennton_utils fennton_grafik)
+target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
+target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
+
+if(MSVC)
+	target_compile_options(${ProgramName} PUBLIC /Zc:preprocessor)
+else()
+	target_compile_options(${ProgramName} PUBLIC
+		-Wpedantic
+		-Werror=return-type
+		# -Wno-switch
+		-Werror=extern-initializer
+		-Werror=microsoft-template
+	)
+endif()

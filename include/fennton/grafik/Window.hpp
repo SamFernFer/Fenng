@@ -7,7 +7,7 @@
 struct GLFWwindow;
 struct GLFWmonitor;
 
-namespace Fennton::Gl {
+namespace Fennton::Grafik {
     class Monitor;
 
     class Window : public Memory::EnableStrongFromThis<Window> {

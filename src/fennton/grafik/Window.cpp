@@ -8,7 +8,7 @@
 
 using namespace Fennton::Memory;
 
-namespace Fennton::Gl {
+namespace Fennton::Grafik {
     Window::Window(GLFWwindow* handle) {
         this->handle = handle;
         glfwSetWindowUserPointer(handle, this);
