@@ -18,5 +18,11 @@ namespace Fennton::Grafik {
     public:
         using Exception::Exception;
     };
+
+    class UniformException : public Exception {
+    public:
+        using Exception::Exception;
+    };
+
 }
 #endif

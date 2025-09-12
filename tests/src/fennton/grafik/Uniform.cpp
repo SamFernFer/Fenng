@@ -3,6 +3,7 @@
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
 
+#include <glm/glm.hpp>
 #include <glad/glad.h>
 
 #include <exception>
@@ -22,6 +23,7 @@ using Grafik::Window;
 using Grafik::Monitor;
 using Grafik::CompilationException;
 using Grafik::LinkingException;
+using Grafik::UniformException;
 
 enum class ShaderType {
     Vertex,
@@ -61,6 +63,19 @@ void deleteProgram(std::uint32_t program);
 void attachShader(std::uint32_t program, std::uint32_t shader);
 void linkProgram(std::uint32_t program);
 void useProgram(std::uint32_t program);
+// Sets the float uniform, throwing if it could not be found.
+void setUniform(std::uint32_t program, std::string const& name, float value);
+// Sets the vec2 uniform, throwing if it could not be found.
+void setUniform(std::uint32_t program, std::string const& name, glm::vec2 value);
+// Sets the vec3 uniform, throwing if it could not be found.
+void setUniform(std::uint32_t program, std::string const& name, glm::vec3 value);
+
+// Sets the float uniform, doing nothing it could not be found.
+void trySetUniform(std::uint32_t program, std::string const& name, float value);
+// Sets the vec2 uniform, doing nothing it could not be found.
+void trySetUniform(std::uint32_t program, std::string const& name, glm::vec2 value);
+// Sets the vec3 uniform, doing nothing it could not be found.
+void trySetUniform(std::uint32_t program, std::string const& name, glm::vec3 value);
 
 int main() {
     try {
@@ -142,12 +157,20 @@ void init() {
         in vec3 vertexPos;
         in vec3 vertexColour;
 
-        uniform vec3 lightPos;
+        uniform vec2 lightPos;
         uniform float lightIntensity;
+        uniform float lightRadius;
 
         void main() {
             vec3 _col = vec3(0.75, 0.5, 0.25) * vertexColour;
-            // _col = dot();
+            vec2 _delta = lightPos - vec2(vertexPos);
+            // Linear attenuation.
+            float _att = lightRadius - dot(_delta, _delta);
+            // Creates the curve, using the condition to skip the multiplication when possible.
+            _att = _att <= 0.0? 0.0 : _att * _att;
+            // Calculates the lighting.
+            _col *= /* _att * */ lightIntensity;
+            // Outputs the fragment's colour.
             FragColour = vec4(_col, 1.0);
         }
     )";
@@ -180,6 +203,9 @@ void loop() {
         }
 
         useProgram(rectProg);
+        trySetUniform(rectProg, "lightIntensity", 0.5f);
+        trySetUniform(rectProg, "lightRadius", 0.2f);
+        trySetUniform(rectProg, "lightPos", glm::vec2(0.0f, 0.0f));
 
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -332,4 +358,44 @@ void linkProgram(std::uint32_t program) {
 }
 void useProgram(std::uint32_t program) {
     glUseProgram(program);
+}
+static std::int32_t getUniformOrThrow(std::uint32_t program, std::string const& name) {
+    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
+    if (_loc < 0) {
+        throw UniformException(std::format(
+            "Uniform {} could not be found.", Text::quote(name)
+        ));
+    }
+    return _loc;
+}
+void setUniform(std::uint32_t program, std::string const& name, float value) {
+    glUniform1f(getUniformOrThrow(program, name), value);
+}
+void setUniform(std::uint32_t program, std::string const& name, glm::vec2 value) {
+    glUniform2f(getUniformOrThrow(program, name), value.x, value.y);
+}
+void setUniform(std::uint32_t program, std::string const& name, glm::vec3 value) {
+    glUniform3f(getUniformOrThrow(program, name), value.x, value.y, value.z);
+}
+
+void trySetUniform(std::uint32_t program, std::string const& name, float value) {
+    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
+    if (_loc < 0) {
+        return;
+    }
+    glUniform1f(getUniformOrThrow(program, name), value);
+}
+void trySetUniform(std::uint32_t program, std::string const& name, glm::vec2 value) {
+    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
+    if (_loc < 0) {
+        return;
+    }
+    glUniform2f(getUniformOrThrow(program, name), value.x, value.y);
+}
+void trySetUniform(std::uint32_t program, std::string const& name, glm::vec3 value) {
+    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
+    if (_loc < 0) {
+        return;
+    }
+    glUniform3f(getUniformOrThrow(program, name), value.x, value.y, value.z);
 }
