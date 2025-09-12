@@ -1,5 +1,5 @@
-#ifndef FENNTON_GL_WINDOW_HPP
-#define FENNTON_GL_WINDOW_HPP
+#ifndef FENNTON_GRAFIK_WINDOW_HPP
+#define FENNTON_GRAFIK_WINDOW_HPP
 
 #include <fennton/utils/Memory.hpp>
 #include <list>
