@@ -8,6 +8,7 @@
 #include <exception>
 #include <format>
 #include <vector>
+#include <optional>
 #include <cstdint>
 
 namespace Console = Fennton::Console;
@@ -27,14 +28,14 @@ enum class ShaderType {
 };
 
 // Mesh using an element buffer object instead of only an array buffer.
-struct ElementMesh {
+struct Mesh {
     std::vector<std::uint32_t> indices;
     std::vector<float> vertices;
     std::uint32_t vao, vbo, ebo;
 };
 
-ElementMesh
-std::uint32_t vertShader, fragShader, prog;
+Mesh rectMesh;
+std::uint32_t vertShader, fragShader, rectProg;
 
 Strong<Window> mainWindow = nullptr;
 
@@ -42,14 +43,13 @@ void init();
 void term();
 void loop();
 
-void createMesh(
-    std::uint64_t size, float* vertices,
-    std::uint32_t* vbo, std::uint32_t* vao
-);
-ElementMesh createElementMesh(
+// Creates a mesh object. If indices is empty, an element buffer object is not generated.
+Mesh createMesh(
     std::vector<float> const& vertices, std::vector<uint32_t> const& indices
-)
-void drawMesh(std::uint32_t vao);
+);
+// Deletes the mesh from the GPU and empties clears its data in the CPU.
+void deleteMesh(Mesh const& mesh);
+void drawMesh(Mesh const& mesh);
 std::uint32_t createShader(ShaderType type, char const* src);
 void deleteShader(std::uint32_t shader);
 std::uint32_t createProgram();
@@ -64,8 +64,12 @@ int main() {
         loop();
     } catch (std::exception& e) {
         Console::printl("[EXCEPTION] {}", e.what());
+        // Pauses to make it possible to see the exception.
+        Console::pause();
     } catch (...) {
         Console::printl("[UNKNOWN EXCEPTION]");
+        // Pauses to make it possible to see the exception.
+        Console::pause();
     }
     term();
 }
@@ -82,13 +86,13 @@ void init() {
     // Initialises the graphics module.
     Grafik::init();
     // The triangle's vertices.
-    float _verts[] = {
+    std::vector<float> _verts = {
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
          0.0f,  0.5f, 0.0f
     };
 
-    rectMesh = createElementMesh(sizeof(_verts), _verts, &triVBO, &triVAO);
+    rectMesh = createMesh(_verts, {});
 
     char const* _vertSrc = R"(
         #version 330 core
@@ -102,24 +106,23 @@ void init() {
         out vec4 FragColour;
 
         void main() {
-            FragColour = vec4(1.0, 0.0, 0.0, 1.0);
+            FragColour = vec4(0.75, 0.5, 0.25, 1.0);
         }
     )";
 
-    vertShader = createShader(GL_VERTEX_SHADER, _vertSrc);
-    fragShader = createShader(GL_FRAGMENT_SHADER, _fragSrc);
-    triProg = createProgram();
-    attachShader(triProg, vertShader);
-    attachShader(triProg, fragShader);
-    linkProgram(triProg);
+    vertShader = createShader(ShaderType::Vertex, _vertSrc);
+    fragShader = createShader(ShaderType::Fragment, _fragSrc);
+    rectProg = createProgram();
+    attachShader(rectProg, vertShader);
+    attachShader(rectProg, fragShader);
+    linkProgram(rectProg);
 }
 void term() {
     deleteShader(fragShader);
     deleteShader(vertShader);
+    deleteMesh(rectMesh);
 
     mainWindow->Destroy();
-
-    Console::pause();
 
     Monitor::term();
     Window::term();
@@ -134,31 +137,17 @@ void loop() {
             glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        useProgram(triProg);
-        drawMesh(triVAO);
+        useProgram(rectProg);
+        drawMesh(rectMesh);
 
         mainWindow->SwapBuffers();
     }
 }
 
-void createMesh(
-    std::uint64_t size, float* vertices,
-    std::uint32_t* vbo, std::uint32_t* vao
-) {
-    glGenVertexArrays(1, vao);
-    glBindVertexArray(*vao);
-
-    glGenBuffers(1, vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-}
-ElementMesh createElementMesh(
+Mesh createMesh(
     std::vector<float> const& vertices, std::vector<uint32_t> const& indices
 ) {
-    ElementMesh _mesh;
+    Mesh _mesh;
     _mesh.vertices = vertices;
     _mesh.indices = indices;
 
@@ -169,27 +158,47 @@ ElementMesh createElementMesh(
     glBindBuffer(GL_ARRAY_BUFFER, _mesh.vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &_mesh.ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh.ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices, GL_STATIC_DRAW);
+    // If `indices` is not empty, generates an EBO to be used for drawing.
+    if (!indices.empty()) {
+        glGenBuffers(1, &_mesh.ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_STATIC_DRAW);
+    }
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    return _mesh;
 }
-void drawElementMesh(ElementMesh mesh) {
-    glBindBuffer(mesh.ebo);
-    glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, NULL);
+void deleteMesh(Mesh const& mesh) {
+    // Deletes the VAO first, because else the EBO and VBO will unbind from it when they get 
+    // deleted and then it would be probably slightly slower.
+    glDeleteVertexArrays(1, &mesh.vao);
+    glDeleteBuffers(1, &mesh.ebo);
+    glDeleteBuffers(1, &mesh.vbo);
 }
-std::uint32_t createShader(std::uint32_t type, char const* src) {
+void drawMesh(Mesh const& mesh) {
+    glBindVertexArray(mesh.vao);
+    if (mesh.ebo != 0) {
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, NULL);
+    } else {
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size());
+    }
+}
+std::uint32_t createShader(ShaderType type, char const* src) {
+    std::uint32_t _type;
     switch (type) {
-        case GL_VERTEX_SHADER:
-        case GL_FRAGMENT_SHADER:
+        case ShaderType::Vertex:
+            _type = GL_VERTEX_SHADER;
+            break;
+        case ShaderType::Fragment:
+            _type = GL_FRAGMENT_SHADER;
             break;
         default:
             throw CompilationException("Unknown shader type.");
     }
     
-    std::uint32_t _shader = glCreateShader(type);
+    std::uint32_t _shader = glCreateShader(_type);
     glShaderSource(_shader, 1, &src, NULL);
     glCompileShader(_shader);
 
