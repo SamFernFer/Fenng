@@ -9,6 +9,7 @@
 #include <format>
 #include <vector>
 #include <optional>
+#include <type_traits>
 #include <cstdint>
 
 namespace Console = Fennton::Console;
@@ -80,7 +81,7 @@ void init() {
     Monitor::init();
 
     // Creates the window.
-    mainWindow = Window::create(800, 600, "Triangle", nullptr, nullptr);
+    mainWindow = Window::create(800, 600, "Rectangle", nullptr, nullptr);
     // A context is necessary before Grafik can be initialised.
     mainWindow->MakeContextCurrent();
     // Initialises the graphics module.
@@ -156,13 +157,23 @@ Mesh createMesh(
 
     glGenBuffers(1, &_mesh.vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _mesh.vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        vertices.size() * sizeof(std::remove_cvref_t<decltype(vertices)>::value_type),
+        vertices.data(),
+        GL_STATIC_DRAW
+    );
 
     // If `indices` is not empty, generates an EBO to be used for drawing.
     if (!indices.empty()) {
         glGenBuffers(1, &_mesh.ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh.ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            indices.size() * sizeof(std::remove_cvref_t<decltype(indices)>::value_type),
+            indices.data(),
+            GL_STATIC_DRAW
+        );
     }
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
