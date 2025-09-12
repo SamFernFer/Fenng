@@ -164,6 +164,10 @@ void loop() {
         }
 
         useProgram(rectProg);
+
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         drawMesh(rectMesh);
 
         mainWindow->SwapBuffers();
