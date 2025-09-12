@@ -106,10 +106,10 @@ void init() {
     // The rectangle's vertex positions and colours, to be used with indices.
     std::vector<float> _verts = {
         // Positions         // Colours.
-         0.5f,  0.5f, 0.0f,   1.0f,     1.0f,   1.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.5f,     0.5f,   0.5f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.25f,   0.25f,  0.25f, // bottom left
-        -0.5f,  0.5f, 0.0f,  0.125f,  0.125f,  0.125f // top left 
+         0.5f,  0.5f, 0.0f,  0.0f,  0.0f,  1.0f, // top right
+         0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  1.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f,  0.0f,  0.0f // top left 
     };
 
     // The rectangle's vertex indices.
