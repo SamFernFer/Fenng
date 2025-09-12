@@ -90,49 +90,65 @@ void init() {
     // Initialises the graphics module.
     Grafik::init();
 
-    #if 0
-    // The rectangle's vertices, with redundancy.
+    #if true
+    // The rectangle's vertices, for using without an element buffer object.
     std::vector<float> _verts = {
         // first triangle
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f,  0.5f, 0.0f,  // top left 
+         0.5f,  0.5f, 0.0f,  0.0f,  0.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,  0.0f,  1.0f, 0.0f, // bottom right
+        -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 1.0f, // top left 
         // second triangle
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left
+         0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 1.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f,  1.0f, 0.0f // top left
     };
-    #endif
-
-    // The rectangle's vertices, to be used with indices.
+    #else
+    // The rectangle's vertex positions and colours, to be used with indices.
     std::vector<float> _verts = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+        // Positions         // Colours.
+         0.5f,  0.5f, 0.0f,   1.0f,     1.0f,   1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.5f,     0.5f,   0.5f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.25f,   0.25f,  0.25f, // bottom left
+        -0.5f,  0.5f, 0.0f,  0.125f,  0.125f,  0.125f // top left 
     };
 
     // The rectangle's vertex indices.
     std::vector<std::uint32_t> _indices = {
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    }; 
+        0, 1, 3,   // First triangle
+        1, 2, 3    // Second triangle
+    };
+    #endif
 
-    rectMesh = createMesh(_verts, _indices);
+    rectMesh = createMesh(_verts, {});
 
     char const* _vertSrc = R"(
         #version 330 core
         layout (location = 0) in vec3 aPos;
+        layout (location = 1) in vec3 aColour;
+
+        out vec3 vertexPos;
+        out vec3 vertexColour;
+
         void main() {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+            gl_Position = vec4(aPos, 1.0);
+            vertexPos = aPos;
+            vertexColour = aColour;
         }
     )";
     char const* _fragSrc = R"(
         #version 330 core
         out vec4 FragColour;
+        
+        in vec3 vertexPos;
+        in vec3 vertexColour;
+
+        uniform vec3 lightPos;
+        uniform float lightIntensity;
 
         void main() {
-            FragColour = vec4(0.75, 0.5, 0.25, 1.0);
+            vec3 _col = vec3(0.75, 0.5, 0.25) * vertexColour;
+            // _col = dot();
+            FragColour = vec4(_col, 1.0);
         }
     )";
 
@@ -206,8 +222,17 @@ Mesh createMesh(
         );
     }
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(
+        0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+        reinterpret_cast<void*>(0)
+    );
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+        reinterpret_cast<void*>(3 * sizeof(float))
+    );
+    glEnableVertexAttribArray(1);
 
     return _mesh;
 }
