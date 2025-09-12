@@ -166,10 +166,10 @@ void init() {
             vec2 _delta = lightPos - vec2(vertexPos);
             // Linear attenuation.
             float _att = lightRadius - dot(_delta, _delta);
-            // Creates the curve, using the condition to skip the multiplication when possible.
-            _att = _att <= 0.0? 0.0 : _att * _att;
+            // Divides by the radius to normalise it.
+            _att /= lightRadius;
             // Calculates the lighting.
-            _col *= /* _att * */ lightIntensity;
+            _col *= _att * lightIntensity;
             // Outputs the fragment's colour.
             FragColour = vec4(_col, 1.0);
         }
@@ -181,6 +181,15 @@ void init() {
     attachShader(rectProg, vertShader);
     attachShader(rectProg, fragShader);
     linkProgram(rectProg);
+
+    useProgram(rectProg);
+    // Sets the uniforms.
+    trySetUniform(rectProg, "lightIntensity", 1.0f);
+    trySetUniform(rectProg, "lightRadius", 0.2f);
+    trySetUniform(rectProg, "lightPos", glm::vec2(0.0f, 0.1f));
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void term() {
     deleteShader(fragShader);
@@ -203,12 +212,6 @@ void loop() {
         }
 
         useProgram(rectProg);
-        trySetUniform(rectProg, "lightIntensity", 0.5f);
-        trySetUniform(rectProg, "lightRadius", 0.2f);
-        trySetUniform(rectProg, "lightPos", glm::vec2(0.0f, 0.0f));
-
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         drawMesh(rectMesh);
 
