@@ -90,7 +90,7 @@ void init() {
     // Initialises the graphics module.
     Grafik::init();
 
-    #if true
+    #if false
     // The rectangle's vertices, for using without an element buffer object.
     std::vector<float> _verts = {
         // first triangle
@@ -119,7 +119,7 @@ void init() {
     };
     #endif
 
-    rectMesh = createMesh(_verts, {});
+    rectMesh = createMesh(_verts, _indices);
 
     char const* _vertSrc = R"(
         #version 330 core
