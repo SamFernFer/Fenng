@@ -86,6 +86,8 @@ void init() {
     mainWindow->MakeContextCurrent();
     // Initialises the graphics module.
     Grafik::init();
+
+    #if 0
     // The rectangle's vertices, with redundancy.
     std::vector<float> _verts = {
         // first triangle
@@ -96,13 +98,24 @@ void init() {
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f,  // bottom left
         -0.5f,  0.5f, 0.0f   // top left
-    }; 
+    };
+    #endif
 
     // The rectangle's vertices, to be used with indices.
+    std::vector<float> _verts = {
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
+    };
 
     // The rectangle's vertex indices.
+    std::vector<std::uint32_t> _indices = {
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
+    }; 
 
-    rectMesh = createMesh(_verts, {});
+    rectMesh = createMesh(_verts, _indices);
 
     char const* _vertSrc = R"(
         #version 330 core
