@@ -29,9 +29,9 @@ enum class ShaderType {
 
 // Mesh using an element buffer object instead of only an array buffer.
 struct Mesh {
-    std::vector<std::uint32_t> indices;
-    std::vector<float> vertices;
-    std::uint32_t vao, vbo, ebo;
+    std::vector<std::uint32_t> indices = {};
+    std::vector<float> vertices = {};
+    std::uint32_t vao = 0, vbo = 0, ebo = 0;
 };
 
 Mesh rectMesh;
@@ -182,7 +182,8 @@ void drawMesh(Mesh const& mesh) {
     if (mesh.ebo != 0) {
         glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, NULL);
     } else {
-        glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size());
+        // The size is divided by 3, because each position has 3 elements.
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size()/3);
     }
 }
 std::uint32_t createShader(ShaderType type, char const* src) {
