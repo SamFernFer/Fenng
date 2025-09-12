@@ -32,6 +32,9 @@ enum class ShaderType {
 struct Mesh {
     std::vector<std::uint32_t> indices = {};
     std::vector<float> vertices = {};
+    // Stores the triangle count, so that there's no need to divide the size of the vertices 
+    // vector by 3 with each draw call without an EBO.
+    std::uint64_t triCount = 0;
     std::uint32_t vao = 0, vbo = 0, ebo = 0;
 };
 
@@ -172,6 +175,7 @@ Mesh createMesh(
 ) {
     Mesh _mesh;
     _mesh.vertices = vertices;
+    _mesh.triCount = vertices.size()/3;
     _mesh.indices = indices;
 
     glGenVertexArrays(1, &_mesh.vao);
@@ -216,7 +220,7 @@ void drawMesh(Mesh const& mesh) {
         glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, NULL);
     } else {
         // The size is divided by 3, because each position has 3 elements.
-        glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size()/3);
+        glDrawArrays(GL_TRIANGLES, 0, mesh.triCount);
     }
 }
 std::uint32_t createShader(ShaderType type, char const* src) {
