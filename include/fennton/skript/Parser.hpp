@@ -1,3 +1,6 @@
+#ifndef FENNTON_SKRIPT_PARSER_HPP
+#define FENNTON_SKRIPT_PARSER_HPP
+
 #include <deque>
 #include <vector>
 #include <string>
@@ -190,3 +193,4 @@ namespace Fennton::Skript {
         std::deque<Tokeniser::Token> tokenise(std::string_view str);
     };
 }
+#endif
