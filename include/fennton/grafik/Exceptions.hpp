@@ -1,3 +1,6 @@
+#ifndef FENNTON_GRAFIK_EXCEPTIONS_HPP
+#define FENNTON_GRAFIK_EXCEPTIONS_HPP
+
 #include <stdexcept>
 
 namespace Fennton::Grafik {
@@ -16,3 +19,4 @@ namespace Fennton::Grafik {
         using Exception::Exception;
     };
 }
+#endif
