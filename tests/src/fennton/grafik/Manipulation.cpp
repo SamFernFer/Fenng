@@ -1,3 +1,28 @@
+/*
+    Tests:
+
+- Window (programatic):
+    - Creation (single window);
+    - Hiding;
+    - Showing;
+    - Iconification;
+    - Restoration from iconification;
+    - Maximisation;
+    - Restoration from maximisation;
+    - Maximisation, iconification and then restoring twice;
+    - Fullscreen on primary monitor;
+    - Fullscreen on monitor 0 (which should be the primary monitor);
+    - Destruction;
+    - Marking the window for closing;
+
+    Does not test:
+
+- Window:
+    - Handling onitor connection and disconnection;
+    - Programatic resizing and repositioning;
+    - Others;
+*/
+
 #include <fennton/grafik/Window.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
