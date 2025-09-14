@@ -3,7 +3,8 @@
     is not corrected based on the window's dimensions, so the light looks stretched at the 
     800x600 resolution. The drawing function now takes the triangle and element counts from the 
     Mesh struct and the triangle count is cached to save on having to perform the same division 
-    with every draw call.
+    with every draw call. Uses vertex colours, whose offsets are still hardcoded in the mesh 
+    loading function.
 */
 
 #include <fennton/grafik/Window.hpp>
