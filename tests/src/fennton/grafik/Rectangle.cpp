@@ -1,3 +1,12 @@
+/*
+    Tests rendering a coloured rectangle over a solid coloured background, using an element 
+    buffer object (the code can be easily edited to allow for using a vertex array object 
+    without an element buffer instead by sending an empty vector as the indices). The only 
+    abstractions relative to the Triangle test are the Mesh class, the ShaderType enum and 
+    using vectors, which already store their sizes, instead of raw pointers with 
+    corresponding size parameters.
+*/
+
 #include <fennton/grafik/Window.hpp>
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Console.hpp>
