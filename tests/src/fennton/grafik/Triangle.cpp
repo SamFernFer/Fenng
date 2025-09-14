@@ -1,3 +1,9 @@
+/*
+    Tests rendering a triangle with a hardcoded colour over a solid coloured background, 
+    with almost no abstraction over the OpenGL calls (mainly just grouping them inside 
+    functions).
+*/
+
 #include <fennton/grafik/Window.hpp>
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Console.hpp>
