@@ -1,3 +1,11 @@
+/*
+    Tests rendering a multicoloured rectangle with a 2D point light over it. The aspect ratio 
+    is not corrected based on the window's dimensions, so the light looks stretched at the 
+    800x600 resolution. The drawing function now takes the triangle and element counts from the 
+    Mesh struct and the triangle count is cached to save on having to perform the same division 
+    with every draw call.
+*/
+
 #include <fennton/grafik/Window.hpp>
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Console.hpp>
