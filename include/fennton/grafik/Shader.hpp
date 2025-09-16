@@ -8,7 +8,7 @@ namespace Fennton::Grafik {
     // An OpenGL shader stage.
     class Stage {
         enum class Type {
-            Vertex, Fragment
+            Geometry, Vertex, Fragment, Compute
         };
     private:
         std::uint32_t id = 0;
