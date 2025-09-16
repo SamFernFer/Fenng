@@ -3,6 +3,7 @@ set(ProgramName fennton_grafik)
 add_library(${ProgramName} STATIC
 	"${PROJECT_SOURCE_DIR}/depends/glad/src/glad.c"
 	"Window.cpp"
+	"Shader.cpp"
 )
 target_link_libraries(${ProgramName} PUBLIC glfw glm)
 target_include_directories(${ProgramName} PUBLIC ${IncludeDir})

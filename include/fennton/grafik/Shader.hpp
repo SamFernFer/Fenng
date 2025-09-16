@@ -1,3 +1,4 @@
+#include <string>
 #include <cstdint>
 
 namespace Fennton::Grafik {
@@ -7,27 +8,32 @@ namespace Fennton::Grafik {
     };
     // An OpenGL shader stage.
     class Stage {
+    public:
         enum class Type {
-            Geometry, Vertex, Fragment, Compute
+            None, Geometry, Vertex, Fragment, Compute
         };
+        using enum Type;
     private:
         std::uint32_t id = 0;
     public:
-        Stage();
+        // Creates a shader stage of the specified type and with the specified source code.
+        static Stage create(Type type, std::string_view src);
+        // Constructs a null shader stage.
+        Stage() = default;
         Stage(Stage const&) = delete;
         Stage(Stage&&) = default;
-        operator=(Stage const&) = delete;
-        operator=(Stage&&) = default;
+        Stage& operator=(Stage const&) = delete;
+        Stage& operator=(Stage&&) = default;
     };
     // An OpenGL shader program.
     class Shader {
     private:
         std::uint32_t id = 0;
     public:
-        Shader();
+        Shader() = default;
         Shader(Shader const&) = delete;
         Shader(Shader&&) = default;
-        operator=(Shader const&) = delete;
-        operator=(Shader&&) = default;
+        Shader& operator=(Shader const&) = delete;
+        Shader& operator=(Shader&&) = default;
     };
 }

@@ -82,7 +82,7 @@ endif()
 # Test: Grafik Shader
 set(ProgramName grafik_shader)
 
-add_executable(${ProgramName} "Shader.cpp")
+add_executable(${ProgramName} "ShaderTest.cpp")
 target_link_libraries(${ProgramName} fennton_utils fennton_grafik)
 target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
 target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})

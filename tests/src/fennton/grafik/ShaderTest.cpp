@@ -8,6 +8,7 @@
 */
 
 #include <fennton/grafik/Window.hpp>
+#include <fennton/grafik/Shader.hpp>
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
@@ -30,6 +31,8 @@ using namespace Fennton::Memory;
 
 using Grafik::Window;
 using Grafik::Monitor;
+using Grafik::Stage;
+using Grafik::Shader;
 using Grafik::CompilationException;
 using Grafik::LinkingException;
 using Grafik::UniformException;
@@ -45,7 +48,8 @@ struct Mesh {
 };
 
 Mesh rectMesh;
-std::uint32_t vertShader, fragShader, rectProg;
+Stage vertShader, fragShader;
+Shader rectProg;
 
 Strong<Window> mainWindow = nullptr;
 
@@ -179,18 +183,18 @@ void init() {
         }
     )";
 
-    vertShader = createShader(ShaderType::Vertex, _vertSrc);
-    fragShader = createShader(ShaderType::Fragment, _fragSrc);
-    rectProg = createProgram();
-    attachShader(rectProg, vertShader);
-    attachShader(rectProg, fragShader);
-    linkProgram(rectProg);
+    vertShader = Stage::create(Stage::Vertex, _vertSrc);
+    fragShader = Stage::create(Stage::Fragment, _fragSrc);
+    rectProg = Shader::create();
+    rectProg.Attach(vertShader);
+    rectProg.Attach(fragShader);
+    rectProg.Link();
 
-    useProgram(rectProg);
+    rectProg.Use();
     // Sets the uniforms.
-    trySetUniform(rectProg, "lightIntensity", 1.0f);
-    trySetUniform(rectProg, "lightRadius", 0.2f);
-    trySetUniform(rectProg, "lightPos", glm::vec2(0.0f, 0.1f));
+    rectProg.Set("lightIntensity", 1.0f);
+    rectProg.Set("lightRadius", 0.2f);
+    rectProg.Set("lightPos", glm::vec2(0.0f, 0.1f));
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
