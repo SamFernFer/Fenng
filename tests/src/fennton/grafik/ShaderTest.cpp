@@ -290,21 +290,6 @@ void drawMesh(Mesh const& mesh) {
     }
 }
 std::uint32_t createShader(ShaderType type, char const* src) {
-    std::uint32_t _type;
-    switch (type) {
-        case ShaderType::Vertex:
-            _type = GL_VERTEX_SHADER;
-            break;
-        case ShaderType::Fragment:
-            _type = GL_FRAGMENT_SHADER;
-            break;
-        default:
-            throw CompilationException("Unknown shader type.");
-    }
-
-    Stage::create(Stage::StageEnum);
-    Stage::SetSource(std::string_view);
-    Stage::SetSource();
     Stage::compile();
     Stage::fromFile(Stage::StageEnum, std::filesystem::path const& path);
     Stage::fromSource(Stage::StageEnum, std::string_view src);
@@ -312,7 +297,6 @@ std::uint32_t createShader(ShaderType type, char const* src) {
     Stage::getLog();
     
     std::uint32_t _shader = glCreateShader(_type);
-    glShaderSource(_shader, 1, &src, NULL);
     glCompileShader(_shader);
 
     // NOTE: includes the null terminator.

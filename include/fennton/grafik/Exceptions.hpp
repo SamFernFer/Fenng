@@ -9,6 +9,11 @@ namespace Fennton::Grafik {
         using std::runtime_error::runtime_error;
     };
 
+    class CreationException : public Exception {
+    public:
+        using Exception::Exception;
+    };
+
     class CompilationException : public Exception {
     public:
         using Exception::Exception;
