@@ -30,6 +30,9 @@ namespace Fennton::Grafik {
         // Compiles the shader stage. Stores the info log, if there is any, 
         // even if there are no errors. Throws on error.
         void Compile();
+        // Moves the fields from the other Stage object into this instance and resets the 
+        // fields of the other instance to their default values.
+        void MoveFrom(Stage&& other);
         // Resets all fields.
         void Reset();
         // Returns the shader stage's ID.
@@ -38,9 +41,9 @@ namespace Fennton::Grafik {
         // Constructs a null shader stage.
         Stage() = default;
         Stage(Stage const&) = delete;
-        Stage(Stage&&) = default;
+        Stage(Stage&&);
         Stage& operator=(Stage const&) = delete;
-        Stage& operator=(Stage&&) = default;
+        Stage& operator=(Stage&&);
         ~Stage();
         // Creates a shader stage of the specified type and with the specified source code 
         // and compiles it. This function may throw or error.
@@ -57,14 +60,17 @@ namespace Fennton::Grafik {
     private:
         std::string infoLog = {};
         std::uint32_t id = 0;
+        // Moves the fields from the other Shader object into this instance and resets the 
+        // fields of the other instance to their default values.
+        void MoveFrom(Shader&& other);
         // Resets all fields.
         void Reset();
     public:
         Shader() = default;
         Shader(Shader const&) = delete;
-        Shader(Shader&&) = default;
+        Shader(Shader&&);
         Shader& operator=(Shader const&) = delete;
-        Shader& operator=(Shader&&) = default;
+        Shader& operator=(Shader&&);
         ~Shader();
         // Creates a shader program without any attached stage.
         static Shader create();

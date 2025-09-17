@@ -7,6 +7,7 @@
 #include <format>
 #include <sstream>
 #include <fstream>
+#include <utility>
 
 namespace fs = std::filesystem;
 namespace Fennton::Grafik {
@@ -19,9 +20,6 @@ namespace Fennton::Grafik {
         std::stringstream _ss;
         return _ss.str();
     } */
-    Stage::~Stage() {
-        Destroy();
-    }
     void Stage::Create(Stage::Type type) {
         std::uint32_t _rawType;
         // Sets the raw type based on the enum value passed.
@@ -71,6 +69,12 @@ namespace Fennton::Grafik {
             throw CompilationException(infoLog);
         }
     }
+    void Stage::MoveFrom(Stage&& other) {
+        this->infoLog = std::move(other.infoLog);
+        this->type = std::move(other.type);
+        this->id = std::move(other.id);
+        other.Reset();
+    }
     void Stage::Reset() {
         infoLog = {};
         type = None;
@@ -79,7 +83,16 @@ namespace Fennton::Grafik {
     std::uint32_t Stage::GetID() const {
         return id;
     }
-
+    Stage::Stage(Stage&& other) {
+        MoveFrom(std::move(other));
+    }
+    Stage& Stage::operator=(Stage&& other) {
+        MoveFrom(std::move(other));
+        return *this;
+    }
+    Stage::~Stage() {
+        Destroy();
+    }
     Stage Stage::build(Stage::Type type, std::string_view src) {
         Stage _stage;
         _stage.Create(type);
@@ -98,8 +111,21 @@ namespace Fennton::Grafik {
         Reset();
     }
 
+    void Shader::MoveFrom(Shader&& other) {
+        this->infoLog = std::move(other.infoLog);
+        this->id = std::move(other.id);
+        other.Reset();
+    }
     void Shader::Reset() {
+        infoLog = {};
         id = 0;
+    }
+    Shader::Shader(Shader&& other) {
+        MoveFrom(std::move(other));
+    }
+    Shader& Shader::operator=(Shader&& other) {
+        MoveFrom(std::move(other));
+        return *this;
     }
     Shader::~Shader() {
         Destroy();
