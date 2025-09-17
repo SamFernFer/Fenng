@@ -64,10 +64,6 @@ Mesh createMesh(
 // Deletes the mesh from the GPU and empties clears its data in the CPU.
 void deleteMesh(Mesh const& mesh);
 void drawMesh(Mesh const& mesh);
-std::uint32_t createShader(ShaderType type, char const* src);
-void deleteShader(std::uint32_t shader);
-std::uint32_t createProgram();
-void deleteProgram(std::uint32_t program);
 void attachShader(std::uint32_t program, std::uint32_t shader);
 void linkShader(Shader const& shader);
 void useProgram(std::uint32_t program);
@@ -183,8 +179,8 @@ void init() {
         }
     )";
 
-    vertShader = Stage::create(Stage::Vertex, _vertSrc);
-    fragShader = Stage::create(Stage::Fragment, _fragSrc);
+    vertShader = Stage::build(Stage::Vertex, _vertSrc);
+    fragShader = Stage::build(Stage::Fragment, _fragSrc);
     rectProg = Shader::create();
     rectProg.Attach(vertShader);
     rectProg.Attach(fragShader);
@@ -200,8 +196,9 @@ void init() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void term() {
-    deleteShader(fragShader);
-    deleteShader(vertShader);
+    fragShader.Destroy();
+    vertShader.Destroy();
+    rectProg.Destroy();
     deleteMesh(rectMesh);
 
     mainWindow->Destroy();
@@ -289,87 +286,8 @@ void drawMesh(Mesh const& mesh) {
         glDrawArrays(GL_TRIANGLES, 0, mesh.triCount);
     }
 }
-std::uint32_t createShader(ShaderType type, char const* src) {
-    Stage::compile();
-    Stage::fromFile(Stage::StageEnum, std::filesystem::path const& path);
-    Stage::fromSource(Stage::StageEnum, std::string_view src);
-    Stage::getStatus();
-    Stage::getLog();
-    
-    std::uint32_t _shader = glCreateShader(_type);
-    glCompileShader(_shader);
-
-    // NOTE: includes the null terminator.
-    std::int32_t _logLength;
-    glGetShaderiv(_shader, GL_INFO_LOG_LENGTH, &_logLength);
-
-    std::string _infoLog = std::string(_logLength == 0? 0 : _logLength-1, '#');
-    glGetShaderInfoLog(_shader, _logLength, NULL, _infoLog.data());
-
-    std::string _msg = std::format("Grafik: {}", _infoLog);
-
-    // Retrieves the compilation status for the shader.
-    std::int32_t _succ;
-    glGetShaderiv(_shader, GL_COMPILE_STATUS, &_succ);
-
-    // Compilation was successful, so just prints what is in the log (maybe warnings).
-    if (_succ == GL_TRUE) {
-        if (_logLength != 0) {
-            Console::printl(_msg);
-        }
-    } else {
-        // Throws an exception because compilation failed.
-        throw CompilationException(_msg);
-    }
-    return _shader;
-}
-void deleteShader(std::uint32_t shader) {
-    Stage::~Shader(); // Conditionally destroy.
-    Stage::destroy();
-    glDeleteShader(shader);
-}
-std::uint32_t createProgram() {
-    Shader::create();
-
-    return glCreateProgram();
-}
-void deleteProgram(std::uint32_t program) {
-    Shader::~Shader(); // Conditionally destroy.
-    Shader::destroy();
-    glDeleteProgram(program);
-}
 void attachShader(std::uint32_t program, std::uint32_t shader) {
-    Shader::attach(Stage const& stage);
     glAttachShader(program, shader);
-}
-void linkProgram(std::uint32_t program) {
-    Shader::link();
-    Shader::getStatus();
-    Shader::getLog();
-
-    glLinkProgram(program);
-
-    // NOTE: includes the null terminator.
-    std::int32_t _logLength;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &_logLength);
-
-    std::string _infoLog = std::string(_logLength == 0? 0 : _logLength-1, '#');
-
-    // Retrieves the link status.
-    std::int32_t _succ;
-    glGetProgramiv(program, GL_LINK_STATUS, &_succ);
-
-    std::string _msg = std::format("Grafik: {}", _infoLog);
-
-    // If linking was successful, just prints any linking log which might exist.
-    if (_succ == GL_TRUE) {
-        if (_logLength != 0) {
-            Console::printl(_msg);
-        }
-    } else {
-        // Throws if linking failed.
-        throw LinkingException(_msg);
-    }
 }
 void useProgram(std::uint32_t program) {
     Shader::Use();
