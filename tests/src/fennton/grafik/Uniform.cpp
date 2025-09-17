@@ -108,7 +108,7 @@ void init() {
     Monitor::init();
 
     // Creates the window.
-    mainWindow = Window::create(800, 600, "Rectangle", nullptr, nullptr);
+    mainWindow = Window::create(800, 600, "Uniform", nullptr, nullptr);
     // A context is necessary before Grafik can be initialised.
     mainWindow->MakeContextCurrent();
     // Initialises the graphics module.
