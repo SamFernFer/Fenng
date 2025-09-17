@@ -64,22 +64,6 @@ Mesh createMesh(
 // Deletes the mesh from the GPU and empties clears its data in the CPU.
 void deleteMesh(Mesh const& mesh);
 void drawMesh(Mesh const& mesh);
-void attachShader(std::uint32_t program, std::uint32_t shader);
-void linkShader(Shader const& shader);
-void useProgram(std::uint32_t program);
-// Sets the float uniform, throwing if it could not be found.
-void setUniform(std::uint32_t program, std::string const& name, float value);
-// Sets the vec2 uniform, throwing if it could not be found.
-void setUniform(std::uint32_t program, std::string const& name, glm::vec2 value);
-// Sets the vec3 uniform, throwing if it could not be found.
-void setUniform(std::uint32_t program, std::string const& name, glm::vec3 value);
-
-// Sets the float uniform, doing nothing it could not be found.
-void trySetUniform(std::uint32_t program, std::string const& name, float value);
-// Sets the vec2 uniform, doing nothing it could not be found.
-void trySetUniform(std::uint32_t program, std::string const& name, glm::vec2 value);
-// Sets the vec3 uniform, doing nothing it could not be found.
-void trySetUniform(std::uint32_t program, std::string const& name, glm::vec3 value);
 
 int main() {
     try {
@@ -216,7 +200,7 @@ void loop() {
             glClear(GL_COLOR_BUFFER_BIT);
         }
 
-        useProgram(rectProg);
+        rectProg.Use();
 
         drawMesh(rectMesh);
 
@@ -285,57 +269,4 @@ void drawMesh(Mesh const& mesh) {
         // The size is divided by 3, because each position has 3 elements.
         glDrawArrays(GL_TRIANGLES, 0, mesh.triCount);
     }
-}
-void attachShader(std::uint32_t program, std::uint32_t shader) {
-    glAttachShader(program, shader);
-}
-void useProgram(std::uint32_t program) {
-    Shader::Use();
-    glUseProgram(program);
-}
-static std::int32_t getUniformOrThrow(std::uint32_t program, std::string const& name) {
-    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
-    if (_loc < 0) {
-        throw UniformException(std::format(
-            "Uniform {} could not be found.", Text::quote(name)
-        ));
-    }
-    return _loc;
-}
-void setUniform(std::uint32_t program, std::string const& name, float value) {
-    Shader::trySet();
-    std::optional<T> Shader::tryGet();
-    Shader::get();
-    Shader::set<float>();
-    glUniform1f(getUniformOrThrow(program, name), value);
-}
-void setUniform(std::uint32_t program, std::string const& name, glm::vec2 value) {
-    Shader::set<glm::vec2>();
-    glUniform2f(getUniformOrThrow(program, name), value.x, value.y);
-}
-void setUniform(std::uint32_t program, std::string const& name, glm::vec3 value) {
-    Shader::set<glm::vec3>();
-    glUniform3f(getUniformOrThrow(program, name), value.x, value.y, value.z);
-}
-
-void trySetUniform(std::uint32_t program, std::string const& name, float value) {
-    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
-    if (_loc < 0) {
-        return;
-    }
-    glUniform1f(getUniformOrThrow(program, name), value);
-}
-void trySetUniform(std::uint32_t program, std::string const& name, glm::vec2 value) {
-    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
-    if (_loc < 0) {
-        return;
-    }
-    glUniform2f(getUniformOrThrow(program, name), value.x, value.y);
-}
-void trySetUniform(std::uint32_t program, std::string const& name, glm::vec3 value) {
-    std::int32_t _loc = glGetUniformLocation(program, name.c_str());
-    if (_loc < 0) {
-        return;
-    }
-    glUniform3f(getUniformOrThrow(program, name), value.x, value.y, value.z);
 }

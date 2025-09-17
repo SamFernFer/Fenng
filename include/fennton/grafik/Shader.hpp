@@ -75,5 +75,21 @@ namespace Fennton::Grafik {
         // Links the shader program. Stores the info log, if there is any, 
         // even if there are no errors. Throws on error.
         void Link();
+        // Binds the shader program.
+        void Use();
+        // The following `Set` functions all attempt to set the uniform named `name` and throw 
+        // if it cannot be found.
+        void Set(std::string const& name, float value);
+        void Set(std::string const& name, glm::vec2 value);
+        void Set(std::string const& name, glm::vec3 value);
+        void Set(std::string const& name, glm::vec4 value);
+
+        // The follow `TrySet` function all attempt to set the uniform named `name` and 
+        // return true on success and false on failure. It is undefined what happens if 
+        // the uniform's type is different from that of the `value` argument.
+        bool TrySet(std::string const& name, float value);
+        bool TrySet(std::string const& name, glm::vec2 value);
+        bool TrySet(std::string const& name, glm::vec3 value);
+        bool TrySet(std::string const& name, glm::vec4 value);
     };
 }

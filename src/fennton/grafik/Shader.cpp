@@ -68,7 +68,7 @@ namespace Fennton::Grafik {
 
         if (_succ == GL_FALSE) {
             // Throws an exception because compilation failed.
-            throw CompilationException(std::format("Grafik: {}", infoLog));
+            throw CompilationException(infoLog);
         }
     }
     void Stage::Reset() {
@@ -107,6 +107,7 @@ namespace Fennton::Grafik {
     Shader Shader::create() {
         Shader _shader;
         _shader.id = glCreateProgram();
+        return _shader;
     }
     void Shader::Destroy() {
         if (id != 0) {
@@ -118,28 +119,78 @@ namespace Fennton::Grafik {
         glAttachShader(id, stage.GetID());
     }
     void Shader::Link() {
-        glLinkProgram(program);
+        glLinkProgram(id);
 
         // NOTE: includes the null terminator.
         std::int32_t _logLength;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &_logLength);
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &_logLength);
 
         infoLog = std::string(_logLength == 0? 0 : _logLength-1, '#');
+        // Writes the info log into the string, even if there are no errors, because it might 
+        // still contain something.
+        glGetProgramInfoLog(id, _logLength, NULL, infoLog.data());
 
         // Retrieves the link status.
         std::int32_t _succ;
-        glGetProgramiv(program, GL_LINK_STATUS, &_succ);
-
-        std::string _msg = ;
+        glGetProgramiv(id, GL_LINK_STATUS, &_succ);
 
         // If linking was successful, just prints any linking log which might exist.
-        if (_succ == GL_TRUE) {
-            if (_logLength != 0) {
-                Console::printl(_msg);
-            }
-        } else {
+        if (_succ == GL_FALSE) {
             // Throws if linking failed.
-            throw LinkingException(std::format("Grafik: {}", infoLog));
+            throw LinkingException(infoLog);
         }
+    }
+    void Shader::Use() {
+        glUseProgram(id);
+    }
+    // Retrieves the uniform location or throws on error.
+    static std::int32_t getLoc(std::uint32_t program, std::string const& name) {
+        std::int32_t _loc = glGetUniformLocation(program, name.c_str());
+        if (_loc < 0) {
+            throw UniformException(std::format(
+                "Uniform {} could not be found.", Text::quote(name)
+            ));
+        }
+        return _loc;
+    }
+    static std::int32_t tryGetLoc(std::uint32_t program, std::string const& name) {
+        return glGetUniformLocation(program, name.c_str());
+    }
+    void Shader::Set(std::string const& name, float value) {
+        glUniform1f(getLoc(id, name), value);
+    }
+    void Shader::Set(std::string const& name, glm::vec2 value) {
+        glUniform2f(getLoc(id, name), value.x, value.y);
+    }
+    void Shader::Set(std::string const& name, glm::vec3 value) {
+        glUniform3f(getLoc(id, name), value.x, value.y, value.z);
+    }
+    void Shader::Set(std::string const& name, glm::vec4 value) {
+        glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
+    }
+
+    bool Shader::TrySet(std::string const& name, float value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform1f(getLoc(id, name), value);
+        return true;
+    }
+    bool Shader::TrySet(std::string const& name, glm::vec2 value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform2f(getLoc(id, name), value.x, value.y);
+        return true;
+    }
+    bool Shader::TrySet(std::string const& name, glm::vec3 value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform3f(getLoc(id, name), value.x, value.y, value.z);
+        return true;
+    }
+    bool Shader::TrySet(std::string const& name, glm::vec4 value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
+        return true;
     }
 }
