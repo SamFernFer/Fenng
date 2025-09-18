@@ -58,6 +58,11 @@ void init();
 void term();
 void loop();
 
+// Retrieves the path to the current executable.
+static fs::path getExePath();
+// Gets the absolute path to the relative path inside the resources folder.
+static fs::path getResPath(fs::path resPath);
+
 // Creates a mesh object. If indices is empty, an element buffer object is not generated.
 Mesh createMesh(
     std::vector<float> const& vertices, std::vector<uint32_t> const& indices
@@ -124,48 +129,8 @@ void init() {
     #endif
 
     rectMesh = createMesh(_verts, _indices);
-
-    char const* _vertSrc = R"(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
-        layout (location = 1) in vec3 aColour;
-
-        out vec3 vertexPos;
-        out vec3 vertexColour;
-
-        void main() {
-            gl_Position = vec4(aPos, 1.0);
-            vertexPos = aPos;
-            vertexColour = aColour;
-        }
-    )";
-    char const* _fragSrc = R"(
-        #version 330 core
-        out vec4 FragColour;
-        
-        in vec3 vertexPos;
-        in vec3 vertexColour;
-
-        uniform vec2 lightPos;
-        uniform float lightIntensity;
-        uniform float lightRadius;
-
-        void main() {
-            vec3 _col = vec3(0.75, 0.5, 0.25) * vertexColour;
-            vec2 _delta = lightPos - vec2(vertexPos);
-            // Linear attenuation.
-            float _att = lightRadius - dot(_delta, _delta);
-            // Divides by the radius to normalise it.
-            _att /= lightRadius;
-            // Calculates the lighting.
-            _col *= _att * lightIntensity;
-            // Outputs the fragment's colour.
-            FragColour = vec4(_col, 1.0);
-        }
-    )";
-
-    vertShader = Stage::build(Stage::Vertex, _vertSrc);
-    fragShader = Stage::build(Stage::Fragment, _fragSrc);
+    vertShader = Stage::build(Stage::Vertex, getResPath("shaders/Rect.vert"));
+    fragShader = Stage::build(Stage::Fragment, getResPath("shaders/Rect.frag"));
     rectProg = Shader::create();
     rectProg.Attach(vertShader);
     rectProg.Attach(fragShader);
@@ -208,7 +173,12 @@ void loop() {
         mainWindow->SwapBuffers();
     }
 }
-
+static fs::path getExePath() {
+    ;
+}
+static fs::path getResPath(fs::path resPath) {
+    return getExePath().parent().parent() / "resources" / resPath;
+}
 Mesh createMesh(
     std::vector<float> const& vertices, std::vector<uint32_t> const& indices
 ) {
