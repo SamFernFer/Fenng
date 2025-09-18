@@ -11,6 +11,7 @@
 #include <fennton/grafik/Window.hpp>
 #include <fennton/grafik/Shader.hpp>
 #include <fennton/grafik/Exceptions.hpp>
+#include <fennton/grafik/Time.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
 #include <fennton/utils/Filesystem.hpp>
