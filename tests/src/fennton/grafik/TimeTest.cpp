@@ -61,6 +61,9 @@ Shader rectProg;
 
 Strong<Window> mainWindow = nullptr;
 
+float invertTimer = 0.0f;
+bool invertLight = false;
+
 void init();
 void term();
 void loop();
@@ -143,11 +146,13 @@ void init() {
 
     rectProg.Use();
     // Sets the uniforms.
-    rectProg.TrySet("lightIntensity", 1.0f);
-    rectProg.TrySet("lightRadius", 0.2f);
+    rectProg.Set("lightIntensity", 1.0f);
+    rectProg.Set("lightRadius", 0.2f);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    invertTimer = static_cast<float>(Grafik::getTime());
 }
 void term() {
     fragShader.Destroy();
@@ -171,9 +176,23 @@ void loop() {
 
             rectProg.Use();
 
+            float _time = static_cast<float>(Grafik::getTime());
+
             constexpr float _interval = 2.0f;
+
+            // Inverts the light with each cycle.
+
+            if (_time - invertTimer > _interval) {
+                invertTimer = _time;
+                invertLight = !invertLight;
+            }
+            // Yes, inverts the boolean before sending to the shader.
+            rectProg.Set("lightIsPositive", !invertLight);
+
+            // Moves the light in a circle.
+
             float const _factor =
-                (std::fmod(static_cast<float>(Grafik::getTime()), _interval)
+                (std::fmod(_time, _interval)
                 * 2.0f / _interval - 1.0f) * glm::pi<float>()
             ;
             float const _x = std::cos(_factor), _y = std::sin(_factor);

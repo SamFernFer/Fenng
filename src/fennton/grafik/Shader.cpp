@@ -198,6 +198,9 @@ namespace Fennton::Grafik {
     void Shader::Set(std::string const& name, glm::vec4 value) {
         glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
     }
+    void Shader::Set(std::string const& name, bool value) {
+        glUniform1i(getLoc(id, name), value);
+    }
 
     bool Shader::TrySet(std::string const& name, float value) {
         auto _loc = tryGetLoc(id, name);
@@ -221,6 +224,12 @@ namespace Fennton::Grafik {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
+        return true;
+    }
+    bool Shader::TrySet(std::string const& name, bool value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform1i(getLoc(id, name), value);
         return true;
     }
 }

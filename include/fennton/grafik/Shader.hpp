@@ -89,6 +89,7 @@ namespace Fennton::Grafik {
         void Set(std::string const& name, glm::vec2 value);
         void Set(std::string const& name, glm::vec3 value);
         void Set(std::string const& name, glm::vec4 value);
+        void Set(std::string const& name, bool value);
 
         // The follow `TrySet` function all attempt to set the uniform named `name` and 
         // return true on success and false on failure. It is undefined what happens if 
@@ -97,5 +98,6 @@ namespace Fennton::Grafik {
         bool TrySet(std::string const& name, glm::vec2 value);
         bool TrySet(std::string const& name, glm::vec3 value);
         bool TrySet(std::string const& name, glm::vec4 value);
+        bool TrySet(std::string const& name, bool value);
     };
 }
