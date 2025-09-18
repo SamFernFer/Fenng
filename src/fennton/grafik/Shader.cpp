@@ -11,15 +11,19 @@
 
 namespace fs = std::filesystem;
 namespace Fennton::Grafik {
-    /* static std::string stringFromFile(std::filesystem::path const& path) {
-        if (!fs::is_file()) {
-            throw Exception(std::format("", Text::quote(path.generic_string())));
+    static std::string stringFromFile(std::filesystem::path const& path) {
+        if (!fs::is_regular_file(path)) {
+            throw Exception(std::format(
+                "Not a file: {}", Text::quote(path.generic_string())
+            ));
         }
         std::fstream _file;
-        _file.exceptions();
+        _file.exceptions(std::ios::failbit | std::ios::badbit);
+        _file.open(path);
         std::stringstream _ss;
+        _ss << _file.rdbuf();
         return _ss.str();
-    } */
+    }
     void Stage::Create(Stage::Type type) {
         std::uint32_t _rawType;
         // Sets the raw type based on the enum value passed.
@@ -100,9 +104,9 @@ namespace Fennton::Grafik {
         _stage.Compile();
         return _stage;
     }
-    /* Stage Stage::buildFromFile(Stage::Type type, std::filesystem::path const& path) {
+    Stage Stage::buildFromFile(Stage::Type type, std::filesystem::path const& path) {
         return Stage::build(type, stringFromFile(path));
-    } */
+    }
     void Stage::Destroy() {
         if (id != 0) {
             glDeleteShader(id);

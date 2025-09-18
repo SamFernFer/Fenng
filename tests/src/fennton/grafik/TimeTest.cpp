@@ -13,6 +13,7 @@
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Console.hpp>
 #include <fennton/utils/Text.hpp>
+#include <fennton/utils/Filesystem.hpp>
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
@@ -22,11 +23,14 @@
 #include <vector>
 #include <optional>
 #include <type_traits>
+#include <filesystem>
 #include <cstdint>
 
+namespace fs = std::filesystem;
 namespace Console = Fennton::Console;
 namespace Text = Fennton::Text;
 namespace Grafik = Fennton::Grafik;
+namespace Fs = Fennton::Filesystem;
 
 using namespace Fennton::Memory;
 
@@ -58,10 +62,8 @@ void init();
 void term();
 void loop();
 
-// Retrieves the path to the current executable.
-static fs::path getExePath();
 // Gets the absolute path to the relative path inside the resources folder.
-static fs::path getResPath(fs::path resPath);
+static fs::path getResPath(fs::path const& resPath);
 
 // Creates a mesh object. If indices is empty, an element buffer object is not generated.
 Mesh createMesh(
@@ -129,8 +131,8 @@ void init() {
     #endif
 
     rectMesh = createMesh(_verts, _indices);
-    vertShader = Stage::build(Stage::Vertex, getResPath("shaders/Rect.vert"));
-    fragShader = Stage::build(Stage::Fragment, getResPath("shaders/Rect.frag"));
+    vertShader = Stage::buildFromFile(Stage::Vertex, getResPath("shaders/Rect.vert"));
+    fragShader = Stage::buildFromFile(Stage::Fragment, getResPath("shaders/Rect.frag"));
     rectProg = Shader::create();
     rectProg.Attach(vertShader);
     rectProg.Attach(fragShader);
@@ -173,11 +175,13 @@ void loop() {
         mainWindow->SwapBuffers();
     }
 }
-static fs::path getExePath() {
+static fs::path getResPath(fs::path const& resPath) {
+    return Fs::getExecutablePath()
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        / "resources" / resPath
     ;
-}
-static fs::path getResPath(fs::path resPath) {
-    return getExePath().parent().parent() / "resources" / resPath;
 }
 Mesh createMesh(
     std::vector<float> const& vertices, std::vector<uint32_t> const& indices

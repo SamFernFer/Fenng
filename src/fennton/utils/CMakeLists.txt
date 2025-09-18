@@ -1,11 +1,16 @@
 set(ProgramName fennton_utils)
 
 add_library(${ProgramName} STATIC
+	"${PROJECT_SOURCE_DIR}/depends/whereami/src/whereami.c"
 	"Console.cpp"
 	"Text.cpp"
+	"Filesystem.cpp"
 )
 
-target_include_directories(${ProgramName} PUBLIC ${IncludeDir})
+target_include_directories(${ProgramName} PUBLIC
+	${IncludeDir}
+	"${PROJECT_SOURCE_DIR}/depends/whereami/src"
+)
 target_include_directories(${ProgramName} SYSTEM PUBLIC ${SystemIncludeDir})
 target_compile_definitions(${ProgramName} PUBLIC
 )
