@@ -19,6 +19,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
+#include <algorithm>
 #include <exception>
 #include <format>
 #include <vector>
@@ -143,7 +144,6 @@ void init() {
     // Sets the uniforms.
     rectProg.TrySet("lightIntensity", 1.0f);
     rectProg.TrySet("lightRadius", 0.2f);
-    rectProg.TrySet("lightPos", glm::vec2(0.0f, 0.1f));
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -169,6 +169,15 @@ void loop() {
             glClear(GL_COLOR_BUFFER_BIT);
 
             rectProg.Use();
+
+            constexpr float _interval = 2.0f;
+            float const _mod = std::fmod(Grafik::getTime(), _interval);
+            float const _factor = 
+                (std::abs(_mod - _interval * 0.5f) - _interval * 0.25f)
+                * (1.0f / _interval)
+            ;
+            rectProg.TrySet("lightPos", glm::vec2(0.3f * _factor, 0.2f));
+
             drawMesh(rectMesh);
         }
 
