@@ -1,11 +1,7 @@
 /*
-    Tests rendering a multicoloured rectangle with a 2D point light over it, using the Stage and 
-    Shader classes instead of global functions and raw shader IDs. The aspect ratio 
-    is not corrected based on the window's dimensions, so the light looks stretched at the 
-    800x600 resolution. The drawing function takes the triangle and element counts from the 
-    Mesh struct and the triangle count is cached to save on having to perform the same division 
-    with every draw call. Uses vertex colours, whose offsets are still hardcoded in the mesh 
-    loading function.
+    Renders a multicoloured rectangle with a point light circling over it on a 2 seconds 
+    cycle and which inverts with every cicle. Dragging the window for too long causes the 
+    inversion cycle to misalign with the movement one.
 */
 
 #include <fennton/grafik/Window.hpp>
