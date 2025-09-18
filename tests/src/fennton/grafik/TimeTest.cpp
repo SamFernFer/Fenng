@@ -17,6 +17,7 @@
 #include <fennton/utils/Filesystem.hpp>
 
 #include <glm/glm.hpp>
+#include <glm/ext/scalar_constants.hpp>
 #include <glad/glad.h>
 
 #include <algorithm>
@@ -171,12 +172,13 @@ void loop() {
             rectProg.Use();
 
             constexpr float _interval = 2.0f;
-            float const _mod = std::fmod(Grafik::getTime(), _interval);
-            float const _factor = 
-                (std::abs(_mod - _interval * 0.5f) - _interval * 0.25f)
-                * (1.0f / _interval)
+            float const _factor =
+                (std::fmod(static_cast<float>(Grafik::getTime()), _interval)
+                * 2.0f / _interval - 1.0f) * glm::pi<float>()
             ;
-            rectProg.TrySet("lightPos", glm::vec2(0.3f * _factor, 0.2f));
+            float const _x = std::cos(_factor), _y = std::sin(_factor);
+
+            rectProg.TrySet("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
 
             drawMesh(rectMesh);
         }
