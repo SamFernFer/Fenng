@@ -104,6 +104,8 @@ void init() {
     mainWindow = Window::create(800, 600, "Time", nullptr, nullptr);
     // A context is necessary before Grafik can be initialised.
     mainWindow->MakeContextCurrent();
+    // Sets the swap interval to 1.
+    Grafik::setSwapInterval(1);
     // Initialises the graphics module.
     Grafik::init();
 

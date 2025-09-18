@@ -317,4 +317,7 @@ namespace Fennton::Grafik {
             throw std::runtime_error("GL: Failed to initialised GLAD.");
         }
     }
+    void setSwapInterval(std::int32_t interval) {
+        glfwSwapInterval(interval);
+    }
 }

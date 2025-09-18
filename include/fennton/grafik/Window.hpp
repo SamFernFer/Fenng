@@ -3,6 +3,7 @@
 
 #include <fennton/utils/Memory.hpp>
 #include <list>
+#include <cstdint>
 
 struct GLFWwindow;
 struct GLFWmonitor;
@@ -160,5 +161,9 @@ namespace Fennton::Grafik {
     // Initialises the OpenGL function pointers. Calling MakeContextCurrent on a window before
     // calling this function is necessary, as the function pointers might change between contexts.
     void init();
+    // Sets the swap interval, the number of monitor refresh frames to wait before swapping a 
+    // window's buffers. A context must be current in the calling thread before calling this 
+    // function.
+    void setSwapInterval(std::int32_t interval);
 }
 #endif
