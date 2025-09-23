@@ -1,12 +1,5 @@
 /*
-    Renders a multicoloured rectangle with a point light circling over it on a 2 seconds 
-    cycle and which inverts with every cicle. Dragging the window for too long causes the 
-    inversion cycle to misalign with the movement one.
-    Tests (mainly):
-- Loading shaders from files;
-- Retrieving the time;
-- Updating uniforms at startup and each frame;
-- Vertex colours;
+
 */
 
 #include <fennton/grafik/Window.hpp>
@@ -102,7 +95,7 @@ void init() {
     Monitor::init();
 
     // Creates the window.
-    mainWindow = Window::create(800, 600, "Time", nullptr, nullptr);
+    mainWindow = Window::create(800, 600, "Texture", nullptr, nullptr);
     // A context is necessary before Grafik can be initialised.
     mainWindow->MakeContextCurrent();
     // Sets the swap interval to 1.
