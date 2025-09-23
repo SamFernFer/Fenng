@@ -55,9 +55,6 @@ Shader rectProg;
 
 Strong<Window> mainWindow = nullptr;
 
-float invertTimer = 0.0f;
-bool invertLight = false;
-
 void init();
 void term();
 void loop();
@@ -134,7 +131,7 @@ void init() {
 
     rectMesh = createMesh(_verts, _indices);
     vertShader = Stage::buildFromFile(Stage::Vertex, getResPath("shaders/Rect.vert"));
-    fragShader = Stage::buildFromFile(Stage::Fragment, getResPath("shaders/Rect.frag"));
+    fragShader = Stage::buildFromFile(Stage::Fragment, getResPath("shaders/Texture.frag"));
     rectProg = Shader::create();
     rectProg.Attach(vertShader);
     rectProg.Attach(fragShader);
@@ -143,7 +140,8 @@ void init() {
     rectProg.Use();
     // Sets the uniforms.
     rectProg.Set("lightIntensity", 1.0f);
-    rectProg.Set("lightRadius", 0.2f);
+    constexpr _lightRadius = 0.2f;
+    rectProg.Set("lightSqrRadius", _lightRadius * _lightRadius);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -176,17 +174,7 @@ void loop() {
 
             constexpr float _interval = 2.0f;
 
-            // Inverts the light with each cycle.
-
-            if (_time - invertTimer > _interval) {
-                invertTimer = _time;
-                invertLight = !invertLight;
-            }
-            // Yes, inverts the boolean before sending to the shader.
-            rectProg.Set("lightIsPositive", !invertLight);
-
             // Moves the light in a circle.
-
             float const _factor =
                 (std::fmod(_time, _interval)
                 * 2.0f / _interval - 1.0f) * glm::pi<float>()
