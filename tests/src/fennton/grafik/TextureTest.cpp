@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glad/glad.h>
+#include <stb_image.h>
 
 #include <algorithm>
 #include <exception>
