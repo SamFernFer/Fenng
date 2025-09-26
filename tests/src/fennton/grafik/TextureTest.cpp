@@ -140,13 +140,11 @@ void init() {
     rectProg.Use();
     // Sets the uniforms.
     rectProg.Set("lightIntensity", 1.0f);
-    constexpr _lightRadius = 0.2f;
+    constexpr float _lightRadius = 0.2f;
     rectProg.Set("lightSqrRadius", _lightRadius * _lightRadius);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    invertTimer = static_cast<float>(Grafik::getTime());
 }
 void term() {
     fragShader.Destroy();
