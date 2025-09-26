@@ -49,8 +49,12 @@ struct Mesh {
     std::uint64_t triCount = 0;
     std::uint32_t vao = 0, vbo = 0, ebo = 0;
 };
+struct Texture {
+    std::uint32_t id;
+};
 
 Mesh rectMesh;
+Texture rectTex;
 Stage vertShader, fragShader;
 Shader rectProg;
 
@@ -70,6 +74,11 @@ Mesh createMesh(
 // Deletes the mesh from the GPU and empties clears its data in the CPU.
 void deleteMesh(Mesh const& mesh);
 void drawMesh(Mesh const& mesh);
+
+Texture createTexture(fs::path const& path);
+void deleteTexture(Texture const& texture);
+// Binds the texture to the specified slot.
+void bindTexture(Texture const& texture, std::uint32_t slot);
 
 int main() {
     try {
@@ -116,11 +125,11 @@ void init() {
     #else
     // The rectangle's vertex positions and colours, to be used with indices.
     std::vector<float> _verts = {
-        // Positions         // Colours.
-         0.5f,  0.5f, 0.0f,  0.0f,  0.0f,  1.0f, // top right
-         0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  1.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,  1.0f,  0.0f,  0.0f // top left 
+        // Positions         // Colours.          // Texture coordinates.
+         0.5f,  0.5f, 0.0f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  1.0f,  0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f  // top left 
     };
 
     // The rectangle's vertex indices.
@@ -131,6 +140,8 @@ void init() {
     #endif
 
     rectMesh = createMesh(_verts, _indices);
+    rectTex = createTexture(getResPath("textures/Art1(256x256).jpg"));
+    
     vertShader = Stage::buildFromFile(Stage::Vertex, getResPath("shaders/Rect.vert"));
     fragShader = Stage::buildFromFile(Stage::Fragment, getResPath("shaders/Texture.frag"));
     rectProg = Shader::create();
@@ -139,10 +150,14 @@ void init() {
     rectProg.Link();
 
     rectProg.Use();
+    // Binds the texture.
+    bindTexture(rectTex, 0);
     // Sets the uniforms.
     rectProg.Set("lightIntensity", 1.0f);
     constexpr float _lightRadius = 0.2f;
     rectProg.Set("lightSqrRadius", _lightRadius * _lightRadius);
+
+    // rectProg.Set("tex1", 0);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -151,6 +166,7 @@ void term() {
     fragShader.Destroy();
     vertShader.Destroy();
     rectProg.Destroy();
+    deleteTexture(rectTex);
     deleteMesh(rectMesh);
 
     mainWindow->Destroy();
@@ -228,17 +244,26 @@ Mesh createMesh(
         );
     }
 
+    // Positions.
     glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+        0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
         reinterpret_cast<void*>(0)
     );
     glEnableVertexAttribArray(0);
 
+    // Colours.
     glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+        1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
         reinterpret_cast<void*>(3 * sizeof(float))
     );
     glEnableVertexAttribArray(1);
+
+    // Texture coordinates.
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+        reinterpret_cast<void*>(6 * sizeof(float))
+    );
+    glEnableVertexAttribArray(2);
 
     return _mesh;
 }
@@ -257,4 +282,47 @@ void drawMesh(Mesh const& mesh) {
         // The size is divided by 3, because each position has 3 elements.
         glDrawArrays(GL_TRIANGLES, 0, mesh.triCount);
     }
+}
+
+Texture createTexture(fs::path const& path) {
+    std::string const _pathStr = path.generic_string();
+
+    std::int32_t _width, _height, _channels;
+    std::uint8_t* _texData = stbi_load(
+        _pathStr.c_str(), &_width, &_height, &_channels, 0
+    );
+    if (!_texData) {
+        throw Grafik::Exception(std::format(
+            "Failed to load texture from path {}",
+            Text::quote(_pathStr)
+        ));
+    }
+
+    Texture _tex;
+    glGenTextures(1, &_tex.id);
+    glBindTexture(GL_TEXTURE_2D, _tex.id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0, GL_RGB, _width, _height,
+        0, GL_RGB, GL_UNSIGNED_BYTE,
+        _texData
+    );
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(_texData);
+
+    return _tex;
+}
+void deleteTexture(Texture const& texture) {
+    glDeleteTextures(1, &texture.id);
+}
+void bindTexture(Texture const& texture, std::uint32_t slot) {
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
 }

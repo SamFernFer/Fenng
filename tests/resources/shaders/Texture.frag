@@ -2,6 +2,7 @@
 out vec4 FragColour;
 
 in vec3 vertexPos;
+in vec2 texCoord;
 
 uniform vec2 lightPos;
 uniform float lightIntensity;
@@ -18,7 +19,7 @@ void main() {
         // Multiplies by the light's intensity.
         _att *= lightIntensity;
         // Outputs the fragment's colour.
-        FragColour = vec4(vec3(1.0, 0.75, 0.5) * _att, 1.0);
+        FragColour = vec4(texture(tex1, texCoord)* _att, 1.0);
     } else {
         FragColour = vec4(vec3(0.0), 1.0);
     }
