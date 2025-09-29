@@ -110,19 +110,6 @@ void init() {
     // Initialises the graphics module.
     Grafik::init();
 
-    #if false
-    // The rectangle's vertices, for using without an element buffer object.
-    std::vector<float> _verts = {
-        // first triangle
-         0.5f,  0.5f, 0.0f,  0.0f,  0.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,  0.0f,  1.0f, 0.0f, // bottom right
-        -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 1.0f, // top left 
-        // second triangle
-         0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 1.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,  1.0f,  1.0f, 0.0f // top left
-    };
-    #else
     // The rectangle's vertex positions and colours, to be used with indices.
     std::vector<float> _verts = {
         // Positions         // Colours.          // Texture coordinates.
@@ -137,12 +124,11 @@ void init() {
         0, 1, 3,   // First triangle
         1, 2, 3    // Second triangle
     };
-    #endif
 
     rectMesh = createMesh(_verts, _indices);
     rectTex = createTexture(getResPath("textures/Art1(256x256).jpg"));
     
-    vertShader = Stage::buildFromFile(Stage::Vertex, getResPath("shaders/Rect.vert"));
+    vertShader = Stage::buildFromFile(Stage::Vertex, getResPath("shaders/Texture.vert"));
     fragShader = Stage::buildFromFile(Stage::Fragment, getResPath("shaders/Texture.frag"));
     rectProg = Shader::create();
     rectProg.Attach(vertShader);
@@ -151,11 +137,14 @@ void init() {
 
     rectProg.Use();
     // Sets the uniforms.
-    rectProg.SetFloat("lightIntensity", 1.0f);
-    constexpr float _lightRadius = 0.2f;
-    rectProg.SetFloat("lightSqrRadius", _lightRadius * _lightRadius);
+    rectProg.TrySetFloat("lightIntensity", 1.0f);
+    constexpr float _lightRadius = 0.4f;
+    rectProg.TrySetFloat("lightSqrRadius", _lightRadius * _lightRadius);
 
-    rectProg.SetInt32("tex1", 0);
+    rectProg.TrySetInt32("tex1", 0);
+
+    // Binds the texture.
+    bindTexture(rectTex, 0);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -195,9 +184,6 @@ void loop() {
             float const _x = std::cos(_factor), _y = std::sin(_factor);
 
             rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
-
-            // Binds the texture.
-            bindTexture(rectTex, 0);
 
             drawMesh(rectMesh);
         }

@@ -2,6 +2,7 @@
 out vec4 FragColour;
 
 in vec3 vertexPos;
+in vec3 vertexColour;
 in vec2 texCoord;
 
 uniform vec2 lightPos;

@@ -229,6 +229,12 @@ namespace Fennton::Grafik {
         glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
         return true;
     }
+    bool Shader::TrySetInt32(std::string const& name, std::int32_t value) {
+        auto _loc = tryGetLoc(id, name);
+        if (_loc < 0) { return false; }
+        glUniform1i(getLoc(id, name), value);
+        return true;
+    }
     bool Shader::TrySetBool(std::string const& name, bool value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }

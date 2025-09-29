@@ -99,6 +99,7 @@ namespace Fennton::Grafik {
         bool TrySetVec2(std::string const& name, glm::vec2 value);
         bool TrySetVec3(std::string const& name, glm::vec3 value);
         bool TrySetVec4(std::string const& name, glm::vec4 value);
+        bool TrySetInt32(std::string const& name, std::int32_t value);
         bool TrySetBool(std::string const& name, bool value);
     };
 }
