@@ -149,8 +149,8 @@ void init() {
 
     rectProg.Use();
     // Sets the uniforms.
-    rectProg.Set("lightIntensity", 1.0f);
-    rectProg.Set("lightRadius", 0.2f);
+    rectProg.SetFloat("lightIntensity", 1.0f);
+    rectProg.SetFloat("lightRadius", 0.2f);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -190,7 +190,7 @@ void loop() {
                 invertLight = !invertLight;
             }
             // Yes, inverts the boolean before sending to the shader.
-            rectProg.Set("lightIsPositive", !invertLight);
+            rectProg.SetBool("lightIsPositive", !invertLight);
 
             // Moves the light in a circle.
 
@@ -200,7 +200,7 @@ void loop() {
             ;
             float const _x = std::cos(_factor), _y = std::sin(_factor);
 
-            rectProg.TrySet("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
+            rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
 
             drawMesh(rectMesh);
         }

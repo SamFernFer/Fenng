@@ -150,14 +150,12 @@ void init() {
     rectProg.Link();
 
     rectProg.Use();
-    // Binds the texture.
-    bindTexture(rectTex, 0);
     // Sets the uniforms.
-    rectProg.Set("lightIntensity", 1.0f);
+    rectProg.SetFloat("lightIntensity", 1.0f);
     constexpr float _lightRadius = 0.2f;
-    rectProg.Set("lightSqrRadius", _lightRadius * _lightRadius);
+    rectProg.SetFloat("lightSqrRadius", _lightRadius * _lightRadius);
 
-    // rectProg.Set("tex1", 0);
+    rectProg.SetInt32("tex1", 0);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -196,7 +194,10 @@ void loop() {
             ;
             float const _x = std::cos(_factor), _y = std::sin(_factor);
 
-            rectProg.TrySet("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
+            rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
+
+            // Binds the texture.
+            bindTexture(rectTex, 0);
 
             drawMesh(rectMesh);
         }

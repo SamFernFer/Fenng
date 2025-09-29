@@ -1,6 +1,8 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 // Skipping the vertex colours.
+
+// Texture coordinates.
 layout (location = 2) in vec2 aTexCoord;
 
 out vec3 vertexPos;

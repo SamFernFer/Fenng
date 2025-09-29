@@ -186,47 +186,50 @@ namespace Fennton::Grafik {
     static std::int32_t tryGetLoc(std::uint32_t program, std::string const& name) {
         return glGetUniformLocation(program, name.c_str());
     }
-    void Shader::Set(std::string const& name, float value) {
+    void Shader::SetFloat(std::string const& name, float value) {
         glUniform1f(getLoc(id, name), value);
     }
-    void Shader::Set(std::string const& name, glm::vec2 value) {
+    void Shader::SetVec2(std::string const& name, glm::vec2 value) {
         glUniform2f(getLoc(id, name), value.x, value.y);
     }
-    void Shader::Set(std::string const& name, glm::vec3 value) {
+    void Shader::SetVec3(std::string const& name, glm::vec3 value) {
         glUniform3f(getLoc(id, name), value.x, value.y, value.z);
     }
-    void Shader::Set(std::string const& name, glm::vec4 value) {
+    void Shader::SetVec4(std::string const& name, glm::vec4 value) {
         glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
     }
-    void Shader::Set(std::string const& name, bool value) {
+    void Shader::SetInt32(std::string const& name, std::int32_t value) {
+        glUniform1i(getLoc(id, name), value);
+    }
+    void Shader::SetBool(std::string const& name, bool value) {
         glUniform1i(getLoc(id, name), value);
     }
 
-    bool Shader::TrySet(std::string const& name, float value) {
+    bool Shader::TrySetFloat(std::string const& name, float value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform1f(getLoc(id, name), value);
         return true;
     }
-    bool Shader::TrySet(std::string const& name, glm::vec2 value) {
+    bool Shader::TrySetVec2(std::string const& name, glm::vec2 value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform2f(getLoc(id, name), value.x, value.y);
         return true;
     }
-    bool Shader::TrySet(std::string const& name, glm::vec3 value) {
+    bool Shader::TrySetVec3(std::string const& name, glm::vec3 value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform3f(getLoc(id, name), value.x, value.y, value.z);
         return true;
     }
-    bool Shader::TrySet(std::string const& name, glm::vec4 value) {
+    bool Shader::TrySetVec4(std::string const& name, glm::vec4 value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
         return true;
     }
-    bool Shader::TrySet(std::string const& name, bool value) {
+    bool Shader::TrySetBool(std::string const& name, bool value) {
         auto _loc = tryGetLoc(id, name);
         if (_loc < 0) { return false; }
         glUniform1i(getLoc(id, name), value);

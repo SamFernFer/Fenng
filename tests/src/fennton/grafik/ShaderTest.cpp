@@ -173,9 +173,9 @@ void init() {
 
     rectProg.Use();
     // Sets the uniforms.
-    rectProg.TrySet("lightIntensity", 1.0f);
-    rectProg.TrySet("lightRadius", 0.2f);
-    rectProg.TrySet("lightPos", glm::vec2(0.0f, 0.1f));
+    rectProg.TrySetFloat("lightIntensity", 1.0f);
+    rectProg.TrySetFloat("lightRadius", 0.2f);
+    rectProg.TrySetVec2("lightPos", glm::vec2(0.0f, 0.1f));
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

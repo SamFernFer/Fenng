@@ -85,19 +85,20 @@ namespace Fennton::Grafik {
         void Use();
         // The following `Set` functions all attempt to set the uniform named `name` and throw 
         // if it cannot be found.
-        void Set(std::string const& name, float value);
-        void Set(std::string const& name, glm::vec2 value);
-        void Set(std::string const& name, glm::vec3 value);
-        void Set(std::string const& name, glm::vec4 value);
-        void Set(std::string const& name, bool value);
+        void SetFloat(std::string const& name, float value);
+        void SetVec2(std::string const& name, glm::vec2 value);
+        void SetVec3(std::string const& name, glm::vec3 value);
+        void SetVec4(std::string const& name, glm::vec4 value);
+        void SetInt32(std::string const& name, std::int32_t value);
+        void SetBool(std::string const& name, bool value);
 
         // The follow `TrySet` function all attempt to set the uniform named `name` and 
         // return true on success and false on failure. It is undefined what happens if 
         // the uniform's type is different from that of the `value` argument.
-        bool TrySet(std::string const& name, float value);
-        bool TrySet(std::string const& name, glm::vec2 value);
-        bool TrySet(std::string const& name, glm::vec3 value);
-        bool TrySet(std::string const& name, glm::vec4 value);
-        bool TrySet(std::string const& name, bool value);
+        bool TrySetFloat(std::string const& name, float value);
+        bool TrySetVec2(std::string const& name, glm::vec2 value);
+        bool TrySetVec3(std::string const& name, glm::vec3 value);
+        bool TrySetVec4(std::string const& name, glm::vec4 value);
+        bool TrySetBool(std::string const& name, bool value);
     };
 }

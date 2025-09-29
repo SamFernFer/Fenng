@@ -8,6 +8,8 @@ uniform vec2 lightPos;
 uniform float lightIntensity;
 uniform float lightSqrRadius;
 
+uniform sampler2D tex1;
+
 void main() {
     vec2 _delta = lightPos - vec2(vertexPos);
     // Linear attenuation.
@@ -19,7 +21,7 @@ void main() {
         // Multiplies by the light's intensity.
         _att *= lightIntensity;
         // Outputs the fragment's colour.
-        FragColour = vec4(texture(tex1, texCoord)* _att, 1.0);
+        FragColour = vec4(texture(tex1, texCoord).xyz * _att, 1.0);
     } else {
         FragColour = vec4(vec3(0.0), 1.0);
     }
