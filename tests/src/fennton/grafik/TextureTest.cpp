@@ -169,6 +169,11 @@ void loop() {
         if (!mainWindow->IsIconified()) {
             glClearColor(0.1f, 0.3f, 0.15f, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
+            glViewport(
+                0, 0,
+                mainWindow->GetFramebufferWidth(),
+                mainWindow->GetFramebufferHeight()
+            );
 
             rectProg.Use();
 
