@@ -1,5 +1,5 @@
 /*
-
+    Tests texture-loading, rendering of a single texture and setting integer uniforms.
 */
 
 #include <fennton/grafik/Window.hpp>
@@ -275,9 +275,16 @@ Texture createTexture(fs::path const& path) {
     std::string const _pathStr = path.generic_string();
 
     std::int32_t _width, _height, _channels;
+
+    // Sets to flip the texture vertically on load.
+    // TODO: save the value manually.
+    stbi_set_flip_vertically_on_load(true);  
     std::uint8_t* _texData = stbi_load(
         _pathStr.c_str(), &_width, &_height, &_channels, 0
     );
+    // Makes texture-loading normal again.
+    stbi_set_flip_vertically_on_load(false);
+
     if (!_texData) {
         throw Grafik::Exception(std::format(
             "Failed to load texture from path {}",
