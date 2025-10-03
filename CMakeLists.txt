@@ -32,6 +32,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib${OutputSubdir}")
 # Adds the external libraries.
 add_subdirectory("${PROJECT_SOURCE_DIR}/depends/glfw")
 add_subdirectory("${PROJECT_SOURCE_DIR}/depends/glm")
+target_compile_definitions(
+    glm PUBLIC "GLM_FORCE_LEFT_HANDED"
+)
 
 # Adds the individual core libraries.
 add_subdirectory("${PROJECT_SOURCE_DIR}/src/fennton/utils")
