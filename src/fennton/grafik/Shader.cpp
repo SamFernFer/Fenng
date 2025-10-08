@@ -9,6 +9,23 @@
 #include <fstream>
 #include <utility>
 
+#define DEPAREN(...) __VA_ARGS__
+
+// `type` must be enclosed in parentheses.
+// `funcBody` is the part which uses the `_loc` variable, storing the uniform's location, 
+// to set the uniform in the shader program.
+#define FENNTON_SHADER_SET_DEF(funcName, valueType, funcBody)\
+    void Shader::Set##funcName (std::string const& name, DEPAREN(valueType) value) {\
+        std::int32_t _loc = getLoc(id, name);\
+        funcBody\
+    }\
+    bool Shader::TrySet##funcName (std::string const& name, DEPAREN(valueType) value) {\
+        std::int32_t _loc = tryGetLoc(id, name);\
+        if (_loc < 0) { return false; }\
+        funcBody\
+        return true;\
+    }
+
 namespace fs = std::filesystem;
 namespace Fennton::Grafik {
     static std::string stringFromFile(std::filesystem::path const& path) {
@@ -186,59 +203,23 @@ namespace Fennton::Grafik {
     static std::int32_t tryGetLoc(std::uint32_t program, std::string const& name) {
         return glGetUniformLocation(program, name.c_str());
     }
-    void Shader::SetFloat(std::string const& name, float value) {
-        glUniform1f(getLoc(id, name), value);
-    }
-    void Shader::SetVec2(std::string const& name, glm::vec2 value) {
-        glUniform2f(getLoc(id, name), value.x, value.y);
-    }
-    void Shader::SetVec3(std::string const& name, glm::vec3 value) {
-        glUniform3f(getLoc(id, name), value.x, value.y, value.z);
-    }
-    void Shader::SetVec4(std::string const& name, glm::vec4 value) {
-        glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
-    }
-    void Shader::SetInt32(std::string const& name, std::int32_t value) {
-        glUniform1i(getLoc(id, name), value);
-    }
-    void Shader::SetBool(std::string const& name, bool value) {
-        glUniform1i(getLoc(id, name), value);
-    }
 
-    bool Shader::TrySetFloat(std::string const& name, float value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform1f(getLoc(id, name), value);
-        return true;
-    }
-    bool Shader::TrySetVec2(std::string const& name, glm::vec2 value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform2f(getLoc(id, name), value.x, value.y);
-        return true;
-    }
-    bool Shader::TrySetVec3(std::string const& name, glm::vec3 value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform3f(getLoc(id, name), value.x, value.y, value.z);
-        return true;
-    }
-    bool Shader::TrySetVec4(std::string const& name, glm::vec4 value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform4f(getLoc(id, name), value.x, value.y, value.z, value.w);
-        return true;
-    }
-    bool Shader::TrySetInt32(std::string const& name, std::int32_t value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform1i(getLoc(id, name), value);
-        return true;
-    }
-    bool Shader::TrySetBool(std::string const& name, bool value) {
-        auto _loc = tryGetLoc(id, name);
-        if (_loc < 0) { return false; }
-        glUniform1i(getLoc(id, name), value);
-        return true;
-    }
+    FENNTON_SHADER_SET_DEF(Float, float, {
+        glUniform1f(_loc, value);
+    })
+    FENNTON_SHADER_SET_DEF(Vec2, glm::vec2, {
+        glUniform2f(_loc, value.x, value.y);
+    })
+    FENNTON_SHADER_SET_DEF(Vec3, glm::vec3, {
+        glUniform3f(_loc, value.x, value.y, value.z);
+    })
+    FENNTON_SHADER_SET_DEF(Vec4, glm::vec4, {
+        glUniform4f(_loc, value.x, value.y, value.z, value.w);
+    })
+    FENNTON_SHADER_SET_DEF(Int32, std::int32_t, {
+        glUniform1i(_loc, value);
+    })
+    FENNTON_SHADER_SET_DEF(Bool, bool, {
+        glUniform1i(_loc, value);
+    })
 }

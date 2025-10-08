@@ -4,6 +4,14 @@
 #include <filesystem>
 #include <cstdint>
 
+#define FENNTON_SHADER_SET_DECL(funcName, ...)\
+    /* Attempts to set the uniform named `name` and throws if it cannot be found.*/\
+    void Set##funcName (std::string const& name, __VA_ARGS__ value);\
+    /* Attempts to set the uniform named `name`. Returns true on success and false on \
+    failure. It is undefined what happens if the uniform's type is different from that \
+    of the `value` argument.*/\
+    bool TrySet##funcName (std::string const& name, __VA_ARGS__ value)
+
 namespace Fennton::Grafik {
     enum class ShaderType {
         Vertex,
@@ -83,23 +91,12 @@ namespace Fennton::Grafik {
         void Link();
         // Binds the shader program.
         void Use();
-        // The following `Set` functions all attempt to set the uniform named `name` and throw 
-        // if it cannot be found.
-        void SetFloat(std::string const& name, float value);
-        void SetVec2(std::string const& name, glm::vec2 value);
-        void SetVec3(std::string const& name, glm::vec3 value);
-        void SetVec4(std::string const& name, glm::vec4 value);
-        void SetInt32(std::string const& name, std::int32_t value);
-        void SetBool(std::string const& name, bool value);
 
-        // The follow `TrySet` function all attempt to set the uniform named `name` and 
-        // return true on success and false on failure. It is undefined what happens if 
-        // the uniform's type is different from that of the `value` argument.
-        bool TrySetFloat(std::string const& name, float value);
-        bool TrySetVec2(std::string const& name, glm::vec2 value);
-        bool TrySetVec3(std::string const& name, glm::vec3 value);
-        bool TrySetVec4(std::string const& name, glm::vec4 value);
-        bool TrySetInt32(std::string const& name, std::int32_t value);
-        bool TrySetBool(std::string const& name, bool value);
+        FENNTON_SHADER_SET_DECL(Float, float);
+        FENNTON_SHADER_SET_DECL(Vec2, glm::vec2);
+        FENNTON_SHADER_SET_DECL(Vec3, glm::vec3);
+        FENNTON_SHADER_SET_DECL(Vec4, glm::vec4);
+        FENNTON_SHADER_SET_DECL(Int32, std::int32_t);
+        FENNTON_SHADER_SET_DECL(Bool, bool);
     };
 }

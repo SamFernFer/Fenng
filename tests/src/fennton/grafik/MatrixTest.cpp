@@ -205,9 +205,9 @@ void loop() {
                 0.1f, 100.0f
             );
 
-            rectProg.TrySetMatrix("model", _model);
-            rectProg.TrySetMatrix("view", _view);
-            rectProg.TrySetMatrix("proj", _proj);
+            rectProg.SetMatrix("model", _model);
+            rectProg.SetMatrix("view", _view);
+            rectProg.SetMatrix("proj", _proj);
 
             drawMesh(rectMesh);
         }
