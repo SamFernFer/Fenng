@@ -11,6 +11,8 @@
 #include <fennton/utils/Filesystem.hpp>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -189,6 +191,23 @@ void loop() {
             float const _x = std::cos(_factor), _y = std::sin(_factor);
 
             rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
+
+            constexpr glm::mat4 _model = glm::mat4(1.0f);
+
+            constexpr glm::mat4 _view = glm::translate(
+                glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 3.0f)
+            );
+
+            const glm::mat4 _proj = glm::perspective(
+                glm::radians(60.0f),
+                static_cast<float>(mainWindow->GetFramebufferWidth())
+                / static_cast<float>(mainWindow->GetFramebufferHeight()),
+                0.1f, 100.0f
+            );
+
+            rectProg.TrySetMatrix("model", _model);
+            rectProg.TrySetMatrix("view", _view);
+            rectProg.TrySetMatrix("proj", _proj);
 
             drawMesh(rectMesh);
         }
