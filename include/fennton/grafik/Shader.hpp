@@ -91,12 +91,16 @@ namespace Fennton::Grafik {
         void Link();
         // Binds the shader program.
         void Use();
-
+        
         FENNTON_SHADER_SET_DECL(Float, float);
-        FENNTON_SHADER_SET_DECL(Vec2, glm::vec2);
-        FENNTON_SHADER_SET_DECL(Vec3, glm::vec3);
-        FENNTON_SHADER_SET_DECL(Vec4, glm::vec4);
         FENNTON_SHADER_SET_DECL(Int32, std::int32_t);
         FENNTON_SHADER_SET_DECL(Bool, bool);
+
+        FENNTON_SHADER_SET_DECL(Vec2, glm::vec2 const&);
+        FENNTON_SHADER_SET_DECL(Vec3, glm::vec3 const&);
+        FENNTON_SHADER_SET_DECL(Vec4, glm::vec4 const&);
+        FENNTON_SHADER_SET_DECL(Mat4, glm::mat4 const&);
+        
+        
     };
 }

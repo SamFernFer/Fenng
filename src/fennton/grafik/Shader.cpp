@@ -15,11 +15,11 @@
 // `funcBody` is the part which uses the `_loc` variable, storing the uniform's location, 
 // to set the uniform in the shader program.
 #define FENNTON_SHADER_SET_DEF(funcName, valueType, funcBody)\
-    void Shader::Set##funcName (std::string const& name, DEPAREN(valueType) value) {\
+    void Shader::Set##funcName (std::string const& name, DEPAREN valueType value) {\
         std::int32_t _loc = getLoc(id, name);\
         funcBody\
     }\
-    bool Shader::TrySet##funcName (std::string const& name, DEPAREN(valueType) value) {\
+    bool Shader::TrySet##funcName (std::string const& name, DEPAREN valueType value) {\
         std::int32_t _loc = tryGetLoc(id, name);\
         if (_loc < 0) { return false; }\
         funcBody\
@@ -207,19 +207,22 @@ namespace Fennton::Grafik {
     FENNTON_SHADER_SET_DEF(Float, float, {
         glUniform1f(_loc, value);
     })
-    FENNTON_SHADER_SET_DEF(Vec2, glm::vec2, {
-        glUniform2f(_loc, value.x, value.y);
-    })
-    FENNTON_SHADER_SET_DEF(Vec3, glm::vec3, {
-        glUniform3f(_loc, value.x, value.y, value.z);
-    })
-    FENNTON_SHADER_SET_DEF(Vec4, glm::vec4, {
-        glUniform4f(_loc, value.x, value.y, value.z, value.w);
-    })
     FENNTON_SHADER_SET_DEF(Int32, std::int32_t, {
         glUniform1i(_loc, value);
     })
     FENNTON_SHADER_SET_DEF(Bool, bool, {
         glUniform1i(_loc, value);
     })
+
+    FENNTON_SHADER_SET_DEF(Vec2, glm::vec2 const&, {
+        glUniform2f(_loc, value.x, value.y);
+    })
+    FENNTON_SHADER_SET_DEF(Vec3, glm::vec3 const&, {
+        glUniform3f(_loc, value.x, value.y, value.z);
+    })
+    FENNTON_SHADER_SET_DEF(Vec4, glm::vec4 const&, {
+        glUniform4f(_loc, value.x, value.y, value.z, value.w);
+    })
+    FENNTON_SHADER_SET_DEF(Mat4, glm::mat4, {
+        glUniformMatrix4fv(_
 }

@@ -192,7 +192,10 @@ void loop() {
 
             rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
 
-            constexpr glm::mat4 _model = glm::mat4(1.0f);
+            constexpr glm::mat4 _model = glm::rotate(
+                glm::mat4(1.0f), glm::radians(30.0f),
+                glm::vec3(0.0f, 1.0f, 0.0f)
+            );
 
             constexpr glm::mat4 _view = glm::translate(
                 glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 3.0f)
