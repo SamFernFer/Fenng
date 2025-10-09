@@ -12,7 +12,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -192,13 +191,13 @@ void loop() {
 
             rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
 
-            constexpr glm::mat4 _model = glm::rotate(
+            const glm::mat4 _model = glm::rotate(
                 glm::mat4(1.0f), glm::radians(30.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f)
             );
 
             constexpr glm::mat4 _view = glm::translate(
-                glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 3.0f)
+                glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 2.0f)
             );
 
             const glm::mat4 _proj = glm::perspective(
@@ -208,9 +207,9 @@ void loop() {
                 0.1f, 100.0f
             );
 
-            rectProg.SetMatrix("model", _model);
-            rectProg.SetMatrix("view", _view);
-            rectProg.SetMatrix("proj", _proj);
+            rectProg.SetMat4("model", _model);
+            rectProg.SetMat4("view", _view);
+            rectProg.SetMat4("proj", _proj);
 
             drawMesh(rectMesh);
         }

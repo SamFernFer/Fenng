@@ -2,6 +2,7 @@
 #include <fennton/grafik/Exceptions.hpp>
 #include <fennton/utils/Text.hpp>
 
+#include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 
 #include <format>
@@ -204,25 +205,26 @@ namespace Fennton::Grafik {
         return glGetUniformLocation(program, name.c_str());
     }
 
-    FENNTON_SHADER_SET_DEF(Float, float, {
+    FENNTON_SHADER_SET_DEF(Float, (float), {
         glUniform1f(_loc, value);
     })
-    FENNTON_SHADER_SET_DEF(Int32, std::int32_t, {
+    FENNTON_SHADER_SET_DEF(Int32, (std::int32_t), {
         glUniform1i(_loc, value);
     })
-    FENNTON_SHADER_SET_DEF(Bool, bool, {
+    FENNTON_SHADER_SET_DEF(Bool, (bool), {
         glUniform1i(_loc, value);
     })
 
-    FENNTON_SHADER_SET_DEF(Vec2, glm::vec2 const&, {
+    FENNTON_SHADER_SET_DEF(Vec2, (glm::vec2 const&), {
         glUniform2f(_loc, value.x, value.y);
     })
-    FENNTON_SHADER_SET_DEF(Vec3, glm::vec3 const&, {
+    FENNTON_SHADER_SET_DEF(Vec3, (glm::vec3 const&), {
         glUniform3f(_loc, value.x, value.y, value.z);
     })
-    FENNTON_SHADER_SET_DEF(Vec4, glm::vec4 const&, {
+    FENNTON_SHADER_SET_DEF(Vec4, (glm::vec4 const&), {
         glUniform4f(_loc, value.x, value.y, value.z, value.w);
     })
-    FENNTON_SHADER_SET_DEF(Mat4, glm::mat4, {
-        glUniformMatrix4fv(_
+    FENNTON_SHADER_SET_DEF(Mat4, (glm::mat4 const&), {
+        glUniformMatrix4fv(_loc, 1, GL_FALSE, glm::value_ptr(value));
+    })
 }
