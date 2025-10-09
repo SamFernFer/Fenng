@@ -137,6 +137,7 @@ void init() {
     rectProg.Link();
 
     rectProg.Use();
+    rectProg.TrySetFloat("ambientIntensity", 0.2f);
     // Sets the uniforms.
     rectProg.TrySetFloat("lightIntensity", 1.0f);
     constexpr float _lightRadius = 0.4f;
@@ -180,7 +181,7 @@ void loop() {
 
             float _time = static_cast<float>(Grafik::getTime());
 
-            constexpr float _interval = 2.0f;
+            constexpr float _interval = 1.5f;
 
             // Moves the light in a circle.
             float const _factor =
@@ -191,8 +192,10 @@ void loop() {
 
             rectProg.TrySetVec2("lightPos", glm::vec2(0.3f * _x, 0.3f * _y));
 
+            constexpr float _spinCycle = 3.5f;
             const glm::mat4 _model = glm::rotate(
-                glm::mat4(1.0f), glm::radians(30.0f),
+                glm::mat4(1.0f),
+                glm::pi<float>() * 2.0f * std::fmod(_time, _spinCycle) * 1.0f / _spinCycle,
                 glm::vec3(0.0f, 1.0f, 0.0f)
             );
 
