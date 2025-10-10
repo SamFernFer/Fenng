@@ -1,5 +1,7 @@
 /*
-    
+    Renders a 3D rectangle spinning on the Y axis, with a circling 2D point light over it.
+    Tests:
+- Matrix uniforms;
 */
 
 #include <fennton/grafik/Window.hpp>
